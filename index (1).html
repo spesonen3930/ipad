@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dashboard">
+<title>Dashboard</title>
+<style>
+:root{--bg:#090b10;--fg:#eef0f4;--dim:#7d8696;--card:#131822;--warm:#f2b45a}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--fg);font-family:-apple-system,"SF Pro Display",system-ui,sans-serif}
+body{display:grid;grid-template-columns:1fr;align-content:start;gap:3vmin;overflow:auto;
+  padding:calc(4vmin + env(safe-area-inset-top)) 4vmin calc(5vmin + env(safe-area-inset-bottom))}
+@media (orientation:landscape){body{grid-template-columns:1.05fr 1fr;overflow:hidden}}
+.col{display:flex;flex-direction:column;gap:3vmin;min-width:0}
+.time{font-size:19vmin;font-weight:200;line-height:.95;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.date{font-size:3vmin;color:var(--dim);margin-top:1vmin}
+.now{display:flex;align-items:center;gap:2.4vmin}
+.now .icon{font-size:9vmin}
+.now .temp{font-size:9vmin;font-weight:200;color:var(--warm)}
+.now .desc{font-size:2.8vmin}
+.now .meta{font-size:2.2vmin;color:var(--dim);margin-top:.4vmin}
+.hours{display:grid;grid-template-columns:repeat(6,1fr);gap:1vmin}
+.cell{background:var(--card);border-radius:2vmin;text-align:center;padding:1.8vmin .3vmin}
+.cell .l{font-size:2vmin;color:var(--dim)}
+.cell .i{font-size:5vmin;margin:.8vmin 0}
+.cell .t{font-size:3vmin}
+.cell .p{font-size:1.8vmin;color:var(--dim);margin-top:.4vmin}
+.card{background:var(--card);border-radius:2.4vmin;padding:2.4vmin}
+.ct{font-size:2vmin;color:var(--dim);margin-bottom:1.2vmin;display:flex;justify-content:space-between}
+.dep{display:flex;align-items:center;gap:2vmin;padding:.9vmin 0;font-size:3vmin}
+.line{background:var(--warm);color:#1a1205;border-radius:1vmin;min-width:6vmin;text-align:center;font-weight:600;padding:.3vmin 1vmin}
+.dep .to{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dep .at{color:var(--dim);font-size:2.2vmin}
+.dep .min{min-width:11vmin;text-align:right;font-variant-numeric:tabular-nums}
+.empty{color:var(--dim);font-size:2.4vmin;padding:1vmin 0}
+.qword{font-size:5.4vmin;font-weight:300;margin:.2vmin 0 1.6vmin}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:1.2vmin}
+.opt{border:0;border-radius:1.4vmin;color:#fff;font:inherit;font-size:2.8vmin;padding:2vmin 1.4vmin;text-align:left;min-height:9vmin}
+.c0{background:#e21b3c}.c1{background:#1368ce}.c2{background:#d89e00}.c3{background:#26890c}
+.opt.dim{opacity:.25}.opt.bad{opacity:.5}.opt.ok{outline:.7vmin solid #fff}
+.ex{display:none;margin-top:1.6vmin;font-size:2.8vmin;line-height:1.35}
+.next{display:none;margin-top:1.6vmin;border:0;border-radius:1.4vmin;background:var(--fg);color:var(--bg);font:inherit;font-size:2.8vmin;font-weight:600;padding:1.6vmin 4vmin}
+.show{display:block}
+#status,#credit{position:fixed;bottom:calc(1vmin + env(safe-area-inset-bottom));font-size:1.6vmin;color:var(--dim)}
+#status{left:2vmin}#credit{right:2vmin}
+</style>
+</head>
+<body>
+<div class="col">
+  <div>
+    <div class="time" id="time">--:--</div><div class="date" id="date"></div>
+  </div>
+  <div class="now">
+    <div class="icon" id="icon"></div><div class="temp" id="temp">--°</div>
+    <div><div class="desc" id="desc"></div><div class="meta" id="meta"></div></div>
+  </div>
+  <div class="hours" id="hours"></div>
+</div>
+<div class="col">
+  <div class="card">
+    <div class="ct"><span id="stopname"></span><span>scheduled times</span></div>
+    <div id="deps"></div>
+  </div>
+  <div class="card">
+    <div class="ct"><span>Deutsch quiz</span><span id="score"></span></div>
+    <div class="qword" id="qword">…</div>
+    <div class="opts" id="opts"></div>
+    <div class="ex" id="ex"></div>
+    <button class="next" id="next">Next</button>
+  </div>
+</div>
+<div id="status"></div>
+<div id="credit">Weather: MeteoSwiss via Open-Meteo · Timetable: transport.opendata.ch</div>
+
+<script>
+// ---- Settings: edit these ----
+const CONFIG = {
+  city: "Zurich", units: "celsius", hours: 6, refreshMinutes: 15,
+  model: "meteoswiss_icon_seamless"      // "" = Open-Meteo default blend
+};
+const TRAM = {
+  station: "Zürich, Hirschwiesenstrasse", // must match the official stop name
+  show: 4,            // departures to display
+  fetchLimit: 60      // departures downloaded per fetch
+};
+// -------------------------------
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, "0");
+
+/* ---------- Clock ---------- */
+function tickClock(){
+  const d = new Date();
+  $("time").textContent = pad(d.getHours()) + ":" + pad(d.getMinutes());
+  $("date").textContent = d.toLocaleDateString([], {weekday:"long", day:"numeric", month:"long"});
+}
+tickClock(); setInterval(tickClock, 1000);
+
+/* ---------- Weather ---------- */
+function wmo(c){
+  if(c===0) return ["☀️","Clear"]; if(c===1) return ["🌤️","Mostly clear"];
+  if(c===2) return ["⛅","Partly cloudy"]; if(c===3) return ["☁️","Overcast"];
+  if(c===45||c===48) return ["🌫️","Fog"]; if(c>=51&&c<=57) return ["🌦️","Drizzle"];
+  if(c>=61&&c<=67) return ["🌧️","Rain"]; if(c>=71&&c<=77) return ["🌨️","Snow"];
+  if(c>=80&&c<=82) return ["🌦️","Showers"]; if(c===85||c===86) return ["🌨️","Snow showers"];
+  if(c>=95) return ["⛈️","Thunderstorm"]; return ["❔",""];
+}
+const unit = CONFIG.units === "fahrenheit" ? "fahrenheit" : "celsius";
+const deg = v => (v == null ? "–" : Math.round(v) + "°");
+let place = null;
+async function loadWeather(){
+  try{
+    if(!place){
+      const g = await (await fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&name=" + encodeURIComponent(CONFIG.city))).json();
+      if(!g.results || !g.results.length) throw new Error("city");
+      place = g.results[0];
+    }
+    const url = "https://api.open-meteo.com/v1/forecast?latitude=" + place.latitude + "&longitude=" + place.longitude +
+      "&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m" +
+      "&hourly=temperature_2m,weather_code,precipitation&temperature_unit=" + unit +
+      "&wind_speed_unit=" + (unit === "fahrenheit" ? "mph" : "kmh") + "&timezone=auto&forecast_days=2" +
+      (CONFIG.model ? "&models=" + CONFIG.model : "");
+    const res = await fetch(url); if(!res.ok) throw new Error(res.status);
+    renderWeather(await res.json()); setStatus("weather", "");
+  }catch(e){ setStatus("weather", "Weather offline"); }
+}
+function renderWeather(w){
+  const c = w.current, h = w.hourly, [ico, txt] = wmo(c.weather_code);
+  $("icon").textContent = ico; $("temp").textContent = deg(c.temperature_2m); $("desc").textContent = txt;
+  $("meta").textContent = (c.apparent_temperature != null ? "Feels like " + deg(c.apparent_temperature) + " · " : "") +
+    (c.wind_speed_10m != null ? "Wind " + Math.round(c.wind_speed_10m) + (unit === "fahrenheit" ? " mph" : " km/h") : "");
+  const now = c.time.slice(0,13) + ":00";
+  let s = h.time.findIndex(t => t > now); if(s < 0) s = 0;
+  const mm = unit === "fahrenheit" ? "in" : "mm";
+  $("hours").innerHTML = h.time.slice(s, s + CONFIG.hours).map((t, k) => {
+    const i = s + k, r = h.precipitation[i];
+    return '<div class="cell"><div class="l">' + t.slice(11,16) + '</div><div class="i">' + wmo(h.weather_code[i])[0] +
+      '</div><div class="t">' + deg(h.temperature_2m[i]) + '</div><div class="p">' + (r == null ? "" : r.toFixed(1) + " " + mm) + '</div></div>';
+  }).join("");
+}
+const status = {};
+function setStatus(k, v){ status[k] = v; $("status").textContent = Object.values(status).filter(Boolean).join(" · "); }
+loadWeather(); setInterval(loadWeather, CONFIG.refreshMinutes * 60000);
+
+/* ---------- Trams: download the timetable rarely, work out "next tram" from the clock ---------- */
+let deps = [], lastTry = 0, lastOk = 0;
+$("stopname").textContent = TRAM.station.replace(/^Zürich, /, "");
+async function loadTrams(){
+  lastTry = Date.now();
+  try{
+    const url = "https://transport.opendata.ch/v1/stationboard?station=" + encodeURIComponent(TRAM.station) +
+      "&limit=" + TRAM.fetchLimit + "&transportations%5B%5D=tram";
+    const res = await fetch(url); if(!res.ok) throw new Error(res.status);
+    const j = await res.json();
+    deps = (j.stationboard || []).filter(s => s.stop && s.stop.departureTimestamp).map(s => ({
+      t: s.stop.departureTimestamp * 1000, line: s.number || s.name, to: (s.to || "").replace(/^Zürich, /, "")
+    })).sort((a, b) => a.t - b.t);
+    lastOk = Date.now(); setStatus("tram", "");
+  }catch(e){ setStatus("tram", "Timetable offline"); }
+  drawTrams();
+}
+function drawTrams(){
+  const now = Date.now(), next = deps.filter(d => d.t > now - 30000).slice(0, TRAM.show);
+  $("deps").innerHTML = next.length ? next.map(d => {
+    const m = Math.ceil((d.t - now) / 60000), at = new Date(d.t);
+    return '<div class="dep"><span class="line">' + d.line + '</span><span class="to">' + d.to + '</span><span class="at">' +
+      pad(at.getHours()) + ":" + pad(at.getMinutes()) + '</span><span class="min">' + (m <= 0 ? "now" : m + " min") + '</span></div>';
+  }).join("") : '<div class="empty">No departures loaded yet</div>';
+}
+function maybeRefetchTrams(){
+  const left = deps.filter(d => d.t > Date.now()).length;
+  const stale = Date.now() - lastOk > 3 * 3600000, low = left < 6;
+  if((stale || low) && Date.now() - lastTry > 5 * 60000) loadTrams();
+}
+loadTrams(); setInterval(drawTrams, 10000); setInterval(maybeRefetchTrams, 60000);
+
+/* ---------- German quiz ---------- */
+let words = [], deck = [], cur = null, answered = false, score = 0, total = 0;
+const shuffle = a => { for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const SHAPES = ["▲", "◆", "●", "■"];
+async function loadWords(){
+  try{ const r = await fetch("words.json"); words = await r.json(); nextQ(); }
+  catch(e){ $("qword").textContent = "words.json not found"; }
+}
+function nextQ(){
+  if(words.length < 4) return;
+  if(!deck.length) deck = shuffle(words.slice());
+  cur = deck.pop(); answered = false;
+  $("ex").className = "ex"; $("next").className = "next";
+  // wrong answers: same kind of word (verb / noun / other), all with different English meanings
+  const kind = w => /^(der|die|das) /.test(w.de) ? "n" : /^to /.test(w.en) ? "v" : "o";
+  const seenEn = new Set([cur.en]), wrong = [];
+  for(const w of shuffle(words.filter(w => kind(w) === kind(cur)))){
+    if(!seenEn.has(w.en)){ seenEn.add(w.en); wrong.push(w); if(wrong.length === 3) break; }
+  }
+  const opts = shuffle([cur, ...wrong]);
+  $("qword").textContent = cur.de;
+  const box = $("opts"); box.innerHTML = "";
+  opts.forEach((o, i) => {
+    const b = document.createElement("button");
+    b.className = "opt c" + i; b.dataset.en = o.en; b.textContent = SHAPES[i] + "  " + o.en; box.appendChild(b);
+  });
+}
+$("opts").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b || answered) return;
+  answered = true; total++; if(b.dataset.en === cur.en) score++;
+  [...$("opts").children].forEach(x => x.classList.add(x.dataset.en === cur.en ? "ok" : x === b ? "bad" : "dim"));
+  $("ex").textContent = cur.ex; $("ex").className = "ex show"; $("next").className = "next show";
+  $("score").textContent = score + " / " + total;
+});
+$("next").addEventListener("click", nextQ);
+loadWords();
+
+/* ---------- Keep the screen on ---------- */
+async function keepAwake(){ try{ if("wakeLock" in navigator) await navigator.wakeLock.request("screen"); }catch(e){} }
+keepAwake(); document.addEventListener("visibilitychange", () => { if(!document.hidden) keepAwake(); });
+</script>
+</body>
+</html>
