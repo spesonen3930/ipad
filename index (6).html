@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dashboard">
+<title>Dashboard</title>
+<style>
+:root{--bg:#080b11;--card:#101622;--card2:#172033;--line:rgba(160,185,230,.13);--fg:#eef1f6;--dim:#8794ab;--warm:#f2b45a;--cool:#6cb4ff;--ok:#41c98f;--bad:#ff7070}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{background:radial-gradient(90% 70% at 12% 0%,#17233d 0%,rgba(23,35,61,0) 60%),radial-gradient(70% 60% at 100% 100%,#1d1a33 0%,rgba(29,26,51,0) 60%),var(--bg);
+  color:var(--fg);font-family:-apple-system,"SF Pro Display",system-ui,sans-serif;
+  touch-action:manipulation;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+.pager{position:fixed;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.pager::-webkit-scrollbar{display:none}
+.page{flex:0 0 100%;width:100%;height:100%;scroll-snap-align:start;scroll-snap-stop:always;display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);gap:2.4vmin;
+  padding:calc(3vmin + env(safe-area-inset-top)) calc(3.4vmin + env(safe-area-inset-right)) calc(4.6vmin + env(safe-area-inset-bottom)) calc(3.4vmin + env(safe-area-inset-left))}
+.page.todopage{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr) 33vmin}
+.dots{position:fixed;left:50%;bottom:calc(.6vmin + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:.4vmin;z-index:5}
+.dots button{width:5vmin;height:3.6vmin;background:none;border:0;display:grid;place-items:center;padding:0}
+.dots button::before{content:"";width:1.1vmin;height:1.1vmin;border-radius:99px;background:#4a5670;transition:all .25s}
+.dots button[aria-current=true]::before{width:3.2vmin;background:var(--fg)}
+button{font:inherit;color:inherit;cursor:pointer}
+.col{display:flex;flex-direction:column;gap:2.4vmin;min-width:0;min-height:0}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.012)),var(--card);border:1px solid var(--line);border-radius:2.6vmin;padding:2.2vmin 2.4vmin;box-shadow:0 .4vmin 2vmin rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05)}
+
+/* ---- left: clock + weather ---- */
+.time{font-size:min(20vmin,14vw);font-weight:200;background:linear-gradient(180deg,#fff 30%,#b9c6dd);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:.95;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.date{font-size:3vmin;color:var(--dim);margin-top:1.2vmin}
+.now{display:flex;align-items:center;gap:2vmin}
+.now .icon{font-size:11vmin;line-height:1;flex:none}
+svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5}
+.sun{flex-wrap:wrap;row-gap:1vmin;justify-content:space-between}
+.sun span{display:flex;align-items:center;gap:1vmin}
+.uv .uvk{font-style:normal;font-size:1.9vmin;font-weight:700;letter-spacing:.06em;color:var(--dim)}
+.uv em{font-style:normal;font-size:1.7vmin;font-weight:600;border-radius:99px;padding:.4vmin 1.1vmin;color:var(--c,var(--dim));background:color-mix(in srgb,var(--c,#8794ab) 16%,transparent)}.sun svg.ic{font-size:3.8vmin}
+.now .temp{font-size:10vmin;font-weight:200;color:var(--warm);line-height:1}
+.nowtxt{min-width:0}
+.now .desc{font-size:2.9vmin}
+.now .meta{font-size:2.2vmin;color:var(--dim);margin-top:.5vmin}
+.sun{display:flex;gap:2.4vmin;margin-top:1.8vmin;padding-top:1.6vmin;border-top:1px solid var(--line);font-size:2.6vmin;color:var(--dim)}
+.sun b{color:var(--fg);font-weight:500;font-variant-numeric:tabular-nums;margin-left:.6vmin}
+.hours{flex:1;min-height:0;display:grid;grid-template-columns:repeat(6,1fr);gap:1vmin}
+.cell{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.01)),var(--card);border:1px solid var(--line);border-radius:2.2vmin;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1vmin;padding:1vmin .2vmin;min-height:0}
+.cell .l{font-size:2vmin;color:var(--dim);font-variant-numeric:tabular-nums}
+.cell .i{font-size:6vmin;line-height:1}
+.cell .t{font-size:3.2vmin}
+.cell .p{font-size:1.7vmin;color:var(--dim)}
+#foot{font-size:1.5vmin;color:var(--dim);line-height:1.4}
+
+/* ---- right: trams ---- */
+.trams{padding:1.6vmin 2.2vmin 1.2vmin}
+.tabs{display:flex;gap:1vmin;margin-bottom:1vmin}
+.tab{background:transparent;border:1px solid transparent;border-radius:99px;padding:.9vmin 2vmin;font-size:2.2vmin;color:var(--dim)}
+.tab[aria-selected=true]{background:var(--card2);border-color:var(--line);color:var(--fg)}
+.dep{display:grid;grid-template-columns:8vmin minmax(0,1fr) auto 12vmin;align-items:center;gap:1.8vmin;height:5.2vmin;font-size:2.6vmin}
+.line{justify-self:start;min-width:7.4vmin;padding:.4vmin 1.1vmin;border-radius:1vmin;text-align:center;font-weight:700;font-size:2.4vmin;line-height:1.2}
+.dep .to{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dep .at{color:var(--dim);font-size:2.2vmin;font-variant-numeric:tabular-nums}
+.dep .min{text-align:right;font-variant-numeric:tabular-nums}
+.empty{color:var(--dim);font-size:2.3vmin;padding:1.4vmin 0}
+
+/* ---- right: quiz ---- */
+.quiz{flex:1;min-height:0;display:flex;flex-direction:column;padding:1.6vmin 2.2vmin 1.8vmin}
+.qhead{display:flex;align-items:center;gap:1.6vmin;flex-wrap:wrap;margin-bottom:1.2vmin}
+.qtitle{font-size:2.3vmin;font-weight:600;white-space:nowrap}
+.pills{display:flex;gap:.7vmin;flex:1;min-width:0;flex-wrap:wrap}
+.pill{background:transparent;border:1px solid var(--line);border-radius:99px;padding:.6vmin 1.4vmin;font-size:1.8vmin;color:var(--dim);white-space:nowrap}
+.pill[aria-pressed=true]{background:var(--card2);color:var(--fg);border-color:#3a4a66}
+.score{font-size:2vmin;color:var(--dim);white-space:nowrap;font-variant-numeric:tabular-nums}
+.qbody{flex:1;min-height:0;overflow:hidden}
+.qtag{font-size:1.9vmin;color:var(--warm);margin-bottom:.8vmin}
+.qprompt{font-size:3.3vmin;line-height:1.3}
+.gap{display:inline-block;min-width:9vmin;border-bottom:.35vmin solid var(--dim);text-align:center;margin:0 .4vmin;line-height:1.1}
+.gap.ok{border-color:var(--ok);color:var(--ok);font-weight:600}
+.qhint{font-size:2.1vmin;color:var(--dim);margin-top:.7vmin;min-height:2.6vmin}
+.opts{display:flex;flex-direction:column;gap:1vmin;margin-top:1.2vmin}
+.opt{display:flex;align-items:center;gap:1.6vmin;width:100%;text-align:left;background:var(--card2);border:1px solid var(--line);border-radius:1.4vmin;padding:1.1vmin 1.6vmin;font-size:2.7vmin}
+.opt .l{flex:none;width:3.6vmin;height:3.6vmin;border-radius:50%;border:1px solid #3a4560;display:grid;place-items:center;font-size:2vmin;color:var(--dim)}
+.opt.ok{border-color:var(--ok);background:rgba(65,201,143,.12)}
+.opt.ok .l{background:var(--ok);border-color:var(--ok);color:#06241a;font-weight:700}
+.opt.bad{border-color:var(--bad);background:rgba(255,112,112,.1)}
+.opt.bad .l{background:var(--bad);border-color:var(--bad);color:#2a0909;font-weight:700}
+.opt.dim{opacity:.4}
+.res{margin-top:1.4vmin;border-left:.4vmin solid var(--line);padding:.3vmin 0 .3vmin 1.6vmin;font-size:2.3vmin;line-height:1.4;display:none}
+.res.show{display:block}.res.measure{visibility:hidden}
+.res.right{border-color:var(--ok)}.res.wrong{border-color:var(--bad)}
+.res b{display:block;margin-bottom:.3vmin}
+.qfoot{display:flex;justify-content:flex-end;height:6vmin;margin-top:1vmin}
+.next{visibility:hidden;background:var(--fg);color:var(--bg);border:0;border-radius:1.4vmin;padding:0 4vmin;font-size:2.6vmin;font-weight:600}
+.next.show{visibility:visible}
+
+
+/* ---- to-do page ---- */
+.todocol{display:contents}
+.todos{display:flex;flex-direction:column;min-height:0;min-width:0;padding:2vmin 2.4vmin 1vmin;--a:#f2b45a;position:relative;overflow:hidden;
+  background:radial-gradient(90% 38% at 0% 0%,color-mix(in srgb,var(--a) 13%,transparent),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.012)),var(--card)}
+.todos[data-kind=reminder]{--a:#6cb4ff}
+.thead{display:flex;align-items:center;gap:1.4vmin;margin-bottom:1vmin;padding-bottom:1.2vmin;border-bottom:1px solid var(--line)}
+.ttitle{font-size:3.2vmin;font-weight:600;letter-spacing:-.01em;display:flex;align-items:center;gap:1.4vmin}
+.ttitle i{display:grid;place-items:center;width:5.4vmin;height:5.4vmin;border-radius:1.6vmin;background:color-mix(in srgb,var(--a) 18%,transparent)}
+.ttitle svg.ic{font-size:3vmin;stroke:var(--a)}
+.tcount{font-size:1.9vmin;color:var(--dim);flex:1}
+.refresh{display:flex;align-items:center;gap:.9vmin;background:var(--card2);border:1px solid var(--line);border-radius:99px;padding:.8vmin 1.8vmin;font-size:2vmin;color:var(--fg);transition:opacity .2s}
+.refresh svg.ic{font-size:2.4vmin;stroke:var(--a)}
+.refresh.idle{opacity:.4}
+.tlist{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.todo{display:flex;align-items:center;gap:1.6vmin;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:1.3vmin .2vmin;font-size:2.7vmin;line-height:1.2;transition:opacity .3s,max-height .35s,padding .35s;max-height:30vmin}
+.todo:last-child{border-bottom:0}
+.todo .box{flex:none;width:3.8vmin;height:3.8vmin;border-radius:50%;border:.3vmin solid var(--c);display:grid;place-items:center;transition:all .2s}
+.todo .box svg.ic{font-size:2.5vmin;stroke:#06141f;stroke-width:2.6;opacity:0}
+.todo .tx{min-width:0;flex:1;overflow-wrap:anywhere}
+.todo .chips{flex:none;display:flex;align-items:center;gap:.9vmin}
+.chip{display:inline-flex;align-items:center;gap:.6vmin;border-radius:99px;padding:.45vmin 1.2vmin;font-size:1.7vmin;font-weight:600;color:var(--c);background:color-mix(in srgb,var(--c) 16%,transparent);white-space:nowrap}
+.chip.p::before{content:"";width:1vmin;height:1vmin;border-radius:50%;background:var(--c)}
+.todo.done{color:var(--dim)}
+.todo.done .tx{text-decoration:line-through;text-decoration-thickness:.25vmin}
+.todo.done .box{background:var(--c)}
+.todo.done .box svg.ic{opacity:1}
+.todo.done .chips{opacity:.45}
+.todo.gone{opacity:0;max-height:0;padding-top:0;padding-bottom:0;overflow:hidden}
+.tempty{color:var(--dim);font-size:2.3vmin;padding:2.6vmin 1vmin;text-align:center}
+.pad{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:3vmin;min-height:0;padding:2vmin 2.4vmin;
+  background:radial-gradient(60% 120% at 0% 100%,rgba(242,180,90,.10),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.012)),var(--card);border-color:rgba(242,180,90,.2)}
+.paper{display:flex;flex-direction:column;min-height:0;background:rgba(5,8,14,.45);border:1px solid var(--line);border-radius:2vmin;padding:1.4vmin 2vmin 1vmin}
+.padtitle{font-size:1.8vmin;color:var(--warm);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4vmin}
+#note{flex:1;min-height:0;width:100%;resize:none;background:repeating-linear-gradient(transparent 0 5.6vmin,rgba(160,185,230,.14) 5.6vmin calc(5.6vmin + 1px));background-attachment:local;border:0;outline:0;color:var(--fg);font:inherit;font-size:3.1vmin;line-height:5.6vmin;padding:0;-webkit-user-select:text;user-select:text;caret-color:var(--warm)}
+#note::placeholder{color:#66748f;font-weight:300}
+.ctl{display:flex;flex-direction:column;justify-content:center;gap:1.6vmin;min-width:0;min-height:0}
+.grp{display:flex;align-items:center;gap:1.6vmin;min-width:0}
+.grp .seg{flex:1;min-width:0}
+.grp>label{flex:none;width:9.5vmin;font-size:2vmin;color:var(--dim)}
+.seg{display:flex;gap:1vmin}
+.seg button{flex:1;height:5.8vmin;min-width:0;border-radius:1.4vmin;border:1px solid var(--line);background:rgba(255,255,255,.03);font-size:2.1vmin;padding:0 .6vmin;color:var(--dim);display:flex;align-items:center;justify-content:center;gap:.7vmin;transition:all .15s}
+.seg button .dot{flex:none;width:1.3vmin;height:1.3vmin;border-radius:50%;background:var(--c)}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--c);background:color-mix(in srgb,var(--c) 22%,transparent);font-weight:600}
+.seg.nudge{animation:nudge .5s}
+@keyframes nudge{0%,100%{transform:none}25%{transform:translateX(-.8vmin)}75%{transform:translateX(.8vmin)}}
+.padfoot{flex:none;display:flex;align-items:center;justify-content:space-between;gap:2vmin;min-width:0;margin-top:.6vmin}
+.padtip{font-size:2vmin;color:var(--dim);min-width:0;flex:1}
+.addbtn{flex:none;background:linear-gradient(180deg,#f7c777,#eaa443);color:#2a1a00;border:0;border-radius:1.6vmin;height:6.4vmin;padding:0 5vmin;font-size:2.7vmin;font-weight:700;box-shadow:0 .5vmin 1.6vmin rgba(242,180,90,.25);transition:opacity .2s}
+.addbtn:disabled{opacity:.35}
+
+/* ---- portrait fallback ---- */
+@media (orientation:portrait){
+  .page,.page.todopage{grid-template-columns:1fr;overflow-y:auto;align-content:start}
+  .hours{flex:none}.cell{padding:2vmin .2vmin}
+  .quiz{flex:none;min-height:80vmin}
+  .qbody{overflow:visible;zoom:1!important}
+}
+</style>
+</head>
+<body>
+<div class="pager" id="pager">
+<section class="page" id="pg-home">
+<div class="col" id="left">
+  <div>
+    <div class="time" id="time">--:--</div>
+    <div class="date" id="date"></div>
+  </div>
+  <div class="card">
+    <div class="now">
+      <div class="icon" id="icon"></div>
+      <div class="temp" id="temp">--°</div>
+      <div class="nowtxt"><div class="desc" id="desc"></div><div class="meta" id="meta"></div></div>
+    </div>
+    <div class="sun"><span><i data-ic="sunrise"></i><b id="sunrise">--:--</b></span><span><i data-ic="sunset"></i><b id="sunset">--:--</b></span><span class="uv"><i class="uvk">UV</i><b id="uv">–</b><em id="uvl"></em></span></div>
+  </div>
+  <div class="hours" id="hours"></div>
+  <div id="foot"></div>
+</div>
+
+<div class="col" id="right">
+  <div class="card trams">
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <div id="deps"></div>
+  </div>
+  <div class="card quiz">
+    <div class="qhead">
+      <div class="qtitle">Deutsch B1</div>
+      <div class="pills" id="pills"></div>
+      <div class="score" id="score"></div>
+    </div>
+    <div class="qbody" id="qbody">
+      <div class="qtag" id="qtag"></div>
+      <div class="qprompt" id="qprompt">…</div>
+      <div class="qhint" id="qhint"></div>
+      <div class="opts" id="opts"></div>
+      <div class="res" id="res"></div>
+    </div>
+    <div class="qfoot"><button class="next" id="next">Next</button></div>
+  </div>
+</div>
+</section>
+
+<section class="page todopage" id="pg-todo">
+  <div class="todocol">
+    <div class="card todos" data-kind="todo">
+      <div class="thead"><div class="ttitle"><i data-ic="list"></i>To-do</div><div class="tcount"></div><button class="refresh idle"><i data-ic="refresh"></i>Refresh</button></div>
+      <div class="tlist"></div>
+    </div>
+    <div class="card todos" data-kind="reminder">
+      <div class="thead"><div class="ttitle"><i data-ic="bell"></i>Reminders</div><div class="tcount"></div><button class="refresh idle"><i data-ic="refresh"></i>Refresh</button></div>
+      <div class="tlist"></div>
+    </div>
+  </div>
+  <div class="card pad">
+    <div class="paper">
+      <div class="padtitle">New note</div>
+      <textarea id="note" placeholder="Add a note!" enterkeyhint="done" autocapitalize="sentences" spellcheck="false"></textarea>
+      <div class="padfoot"><span class="padtip" id="padtip">Write with the Pencil or type</span><button class="addbtn" id="addnote" disabled>Add</button></div>
+    </div>
+    <div class="ctl">
+      <div class="grp"><label>Add to</label><div class="seg" id="g-kind"></div></div>
+      <div class="grp"><label>For</label><div class="seg" id="g-who"></div></div>
+      <div class="grp"><label>Priority</label><div class="seg" id="g-pri"></div></div>
+    </div>
+  </div>
+</section>
+</div>
+<div class="dots" id="dots"><button aria-label="Dashboard" aria-current="true"></button><button aria-label="To-do"></button></div>
+
+<script>
+// ---------------- Settings: edit these ----------------
+const CONFIG = {
+  city: "Zurich", units: "celsius", hours: 6, refreshMinutes: 15,
+  model: "meteoswiss_icon_seamless"          // "" = Open-Meteo default blend
+};
+const STOPS = [
+  {key: "hirsch",    label: "Hirschwiesenstrasse", station: "Zürich, Hirschwiesenstrasse"},
+  {key: "milchbuck", label: "Milchbuck",           station: "Zürich, Milchbuck", hide: ["10","51","69"], hideTo: {"7": "Stettbach", "9": "Hirzenbach"}, minMin: 6}
+];
+const TRAM_ROWS = 4;       // departures shown
+const TRAM_FETCH = 60;     // departures downloaded per fetch
+// Line badge colours: number -> [background, text, border]. Anything else (buses) is yellow.
+const LINE_COLORS = {
+  "10": ["#e6007e", "#ffffff", "#e6007e"],   // pink
+  "51": ["#000000", "#ffffff", "#5b6577"],   // black
+  "7":  ["#000000", "#ffffff", "#5b6577"],   // black
+  "9":  ["#7b2cbf", "#ffffff", "#7b2cbf"]    // purple
+};
+const LINE_DEFAULT = ["#ffd400", "#1a1400", "#ffd400"];   // yellow
+// -------------------------------------------------------
+
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, "0");
+const shuffle = a => { for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const status = {};
+function setStatus(k, v){ status[k] = v; $("foot").textContent = Object.values(status).filter(Boolean).join(" · ") ; renderFoot(); }
+function renderFoot(){
+  const msgs = Object.values(status).filter(Boolean);
+  $("foot").textContent = (msgs.length ? msgs.join(" · ") + " — " : "") + "Weather: MeteoSwiss via Open-Meteo · Timetable: transport.opendata.ch";
+}
+renderFoot();
+
+/* ---------- Clock ---------- */
+function tickClock(){
+  const d = new Date();
+  $("time").textContent = pad(d.getHours()) + ":" + pad(d.getMinutes());
+  $("date").textContent = d.toLocaleDateString("en-GB", {weekday: "long", day: "numeric", month: "long"});
+}
+tickClock(); setInterval(tickClock, 1000);
+
+
+/* ---------- Icons (own line-style set, 24x24) ---------- */
+const IC = (()=>{
+  const C="#a9b7cc", A="#f2b45a", B="#6cb4ff", M="#cdd6ff", S="#d6ecff";
+  const cloud = (t) => '<g transform="'+t+'"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" fill="rgba(169,183,204,.16)" stroke="'+C+'"/></g>';
+  const sun = (x,y,r,ray) => { let o='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="rgba(242,180,90,.25)" stroke="'+A+'"/>';
+    for(let i=0;i<8;i++){ const a=i*Math.PI/4, c=Math.cos(a), s=Math.sin(a); o+='<path d="M'+(x+c*(r+ray*.45)).toFixed(2)+' '+(y+s*(r+ray*.45)).toFixed(2)+'L'+(x+c*(r+ray)).toFixed(2)+' '+(y+s*(r+ray)).toFixed(2)+'" stroke="'+A+'"/>'; } return o; };
+  const moon = (t) => '<g transform="'+t+'"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="rgba(205,214,255,.2)" stroke="'+M+'"/></g>';
+  const small = "translate(1.5 -2.5) scale(.82)";
+  const rain = '<path d="M8 16.5l-1 3M12 16.5l-1 3M16 16.5l-1 3" stroke="'+B+'"/>';
+  const k = {
+    clear:   d => d ? sun(12,12,4.2,3.2) : moon("translate(2 2) scale(.83)"),
+    mostly:  d => (d ? sun(9.5,9.5,3.6,2.8) : moon("translate(1 1) scale(.6)")) + cloud("translate(11 11) scale(.5)"),
+    partly:  d => (d ? sun(8.5,8,3,2.4) : moon("translate(1 .5) scale(.5)")) + cloud("translate(5 4.5) scale(.66)"),
+    cloud:   d => cloud("translate(0 0)"),
+    fog:     d => cloud(small) + '<path d="M5 17.5h14M8 20.5h8" stroke="'+C+'"/>',
+    drizzle: d => cloud(small) + '<path d="M8 17v2M12 17.5v2M16 17v2" stroke="'+B+'"/>',
+    rain:    d => cloud(small) + rain,
+    snow:    d => cloud(small) + '<g fill="'+S+'" stroke="none"><circle cx="8" cy="18" r="1.1"/><circle cx="12" cy="20.4" r="1.1"/><circle cx="16" cy="18" r="1.1"/></g>',
+    thunder: d => cloud(small) + '<path d="M13 14l-4 5.5h3.5L11 23l5-6.5h-3.5L14 14z" fill="'+A+'" stroke="'+A+'" stroke-width="1"/>',
+    sunrise: d => '<path d="M17 18a5 5 0 0 0-10 0M12 9V4M4.2 11.2l1.4 1.4M1.5 18h2M20.5 18h2M18.4 12.6l1.4-1.4" stroke="'+A+'"/><path d="M8.5 6.5L12 3l3.5 3.5" stroke="'+A+'"/><path d="M2 22h20" stroke="#6b7a94"/>',
+    sunset:  d => '<path d="M17 18a5 5 0 0 0-10 0M12 3v5M4.2 11.2l1.4 1.4M1.5 18h2M20.5 18h2M18.4 12.6l1.4-1.4" stroke="#f08a5d"/><path d="M8.5 5.5L12 9l3.5-3.5" stroke="#f08a5d"/><path d="M2 22h20" stroke="#6b7a94"/>',
+    refresh: d => '<path d="M20 11a8 8 0 0 0-14.5-3.5L4 9M4 4v5h5M4 13a8 8 0 0 0 14.5 3.5L20 15M20 20v-5h-5"/>',
+    list:    d => '<path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/>',
+    bell:    d => '<path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9zM10 20a2 2 0 0 0 4 0"/>',
+    check:   d => '<path d="M5 12.5l4.5 4.5L19 7.5"/>'
+  };
+  return (name, day) => '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">' + (k[name] || k.cloud)(day !== false) + '</svg>';
+})();
+const paintIcons = root => (root || document).querySelectorAll("[data-ic]").forEach(e => { e.innerHTML = IC(e.dataset.ic); });
+paintIcons();
+let sunMin = {r: 7 * 60, s: 19 * 60};
+const isDay = t => { const m = +t.slice(11,13) * 60 + +t.slice(14,16); return m >= sunMin.r && m < sunMin.s; };
+
+/* ---------- Weather ---------- */
+function wmo(c){
+  if(c===0) return ["clear","Clear"]; if(c===1) return ["mostly","Mostly clear"];
+  if(c===2) return ["partly","Partly cloudy"]; if(c===3) return ["cloud","Overcast"];
+  if(c===45||c===48) return ["fog","Fog"]; if(c>=51&&c<=57) return ["drizzle","Drizzle"];
+  if(c>=61&&c<=67) return ["rain","Rain"]; if(c>=71&&c<=77) return ["snow","Snow"];
+  if(c>=80&&c<=82) return ["rain","Showers"]; if(c===85||c===86) return ["snow","Snow showers"];
+  if(c>=95) return ["thunder","Thunderstorm"]; return ["cloud",""];
+}
+const unit = CONFIG.units === "fahrenheit" ? "fahrenheit" : "celsius";
+const deg = v => (v == null ? "–" : Math.round(v) + "°");
+let place = null;
+async function locate(){
+  if(place) return place;
+  const g = await (await fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&name=" + encodeURIComponent(CONFIG.city))).json();
+  if(!g.results || !g.results.length) throw new Error("city");
+  return (place = g.results[0]);
+}
+async function loadWeather(){
+  try{
+    const p = await locate();
+    const url = "https://api.open-meteo.com/v1/forecast?latitude=" + p.latitude + "&longitude=" + p.longitude +
+      "&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m" +
+      "&hourly=temperature_2m,weather_code,precipitation&temperature_unit=" + unit +
+      "&wind_speed_unit=" + (unit === "fahrenheit" ? "mph" : "kmh") + "&timezone=auto&forecast_days=2" +
+      (CONFIG.model ? "&models=" + CONFIG.model : "");
+    const res = await fetch(url); if(!res.ok) throw new Error(res.status);
+    lastW = await res.json(); renderWeather(lastW); setStatus("weather", "");
+  }catch(e){ setStatus("weather", "Weather offline"); }
+}
+let lastW = null;
+function renderWeather(w){
+  const c = w.current, h = w.hourly, [ico, txt] = wmo(c.weather_code);
+  $("icon").innerHTML = IC(ico, isDay(c.time)); $("temp").textContent = deg(c.temperature_2m); $("desc").textContent = txt;
+  $("meta").textContent = (c.apparent_temperature != null ? "Feels like " + deg(c.apparent_temperature) + " · " : "") +
+    (c.wind_speed_10m != null ? "Wind " + Math.round(c.wind_speed_10m) + (unit === "fahrenheit" ? " mph" : " km/h") : "");
+  const now = c.time.slice(0,13) + ":00";
+  let s = h.time.findIndex(t => t > now); if(s < 0) s = 0;
+  const mm = unit === "fahrenheit" ? "in" : "mm";
+  $("hours").innerHTML = h.time.slice(s, s + CONFIG.hours).map((t, k) => {
+    const i = s + k, r = h.precipitation[i];
+    return '<div class="cell"><div class="l">' + t.slice(11,16) + '</div><div class="i">' + IC(wmo(h.weather_code[i])[0], isDay(t)) +
+      '</div><div class="t">' + deg(h.temperature_2m[i]) + '</div><div class="p">' + (r == null ? "" : r.toFixed(1) + " " + mm) + '</div></div>';
+  }).join("");
+}
+// Sunrise and sunset come from a separate plain request so they do not depend on the weather model above.
+async function loadSun(){
+  try{
+    const p = await locate();
+    const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=" + p.latitude + "&longitude=" + p.longitude +
+      "&current=uv_index&daily=sunrise,sunset&timezone=auto&forecast_days=1");
+    if(!res.ok) throw new Error(res.status);
+    const j = await res.json(), d = j.daily;
+    const uv = j.current && j.current.uv_index;
+    if(uv != null){ const L = uv < 3 ? ["Low", "#41c98f"] : uv < 6 ? ["Moderate", "#f2d14b"] : uv < 8 ? ["High", "#f2994a"] : uv < 11 ? ["Very high", "#ff6b6b"] : ["Extreme", "#b074ff"];
+      $("uv").textContent = (Math.round(uv * 10) / 10).toString(); $("uvl").textContent = L[0]; $("uvl").style.setProperty("--c", L[1]); }
+    $("sunrise").textContent = d.sunrise[0].slice(11,16);
+    $("sunset").textContent = d.sunset[0].slice(11,16);
+    const mn = x => +x.slice(11,13) * 60 + +x.slice(14,16);
+    sunMin = {r: mn(d.sunrise[0]), s: mn(d.sunset[0])}; if(lastW) renderWeather(lastW);
+  }catch(e){ /* keep the dashes */ }
+}
+loadWeather(); loadSun();
+setInterval(loadWeather, CONFIG.refreshMinutes * 60000);
+setInterval(loadSun, 30 * 60000);
+
+/* ---------- Trams: download the timetable rarely, work out "next departure" from the clock ---------- */
+const board = {}; STOPS.forEach(s => board[s.key] = {deps: [], lastTry: 0, lastOk: 0});
+let activeStop = STOPS[0].key;
+function lineStyle(n){
+  const c = LINE_COLORS[n] || LINE_DEFAULT;
+  return "background:" + c[0] + ";color:" + c[1] + ";box-shadow:inset 0 0 0 .3vmin " + c[2];
+}
+async function loadStop(s){
+  const b = board[s.key]; b.lastTry = Date.now();
+  try{
+    const url = "https://transport.opendata.ch/v1/stationboard?station=" + encodeURIComponent(s.station) + "&limit=" + TRAM_FETCH;
+    const res = await fetch(url); if(!res.ok) throw new Error(res.status);
+    const j = await res.json();
+    b.deps = (j.stationboard || []).filter(x => x.stop && x.stop.departureTimestamp).map(x => ({
+      t: x.stop.departureTimestamp * 1000, line: String(x.number || x.name || "?"), to: (x.to || "").replace(/^Zürich, /, "")
+    })).sort((p, q) => p.t - q.t);
+    b.lastOk = Date.now(); setStatus("tram-" + s.key, "");
+  }catch(e){ setStatus("tram-" + s.key, s.label + " timetable offline"); }
+  drawTrams();
+}
+function drawTabs(){
+  $("tabs").innerHTML = "";
+  STOPS.forEach(s => {
+    const b = document.createElement("button");
+    b.className = "tab"; b.textContent = s.label; b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", s.key === activeStop ? "true" : "false");
+    b.onclick = () => { activeStop = s.key; drawTabs(); drawTrams(); };
+    $("tabs").appendChild(b);
+  });
+}
+function drawTrams(){
+  const now = Date.now(), st = STOPS.find(x => x.key === activeStop);
+  const next = board[activeStop].deps.filter(d => d.t > now - 30000 && !(st.hide || []).includes(String(d.line)) && !(st.hideTo && st.hideTo[String(d.line)] && String(d.to).toLowerCase().includes(st.hideTo[String(d.line)].toLowerCase())) && (!st.minMin || Math.ceil((d.t - now) / 60000) >= st.minMin)).slice(0, TRAM_ROWS);
+  const box = $("deps"); box.innerHTML = "";
+  if(!next.length){ const e = document.createElement("div"); e.className = "empty"; e.textContent = "No departures loaded yet"; box.appendChild(e); return; }
+  next.forEach(d => {
+    const m = Math.ceil((d.t - now) / 60000), at = new Date(d.t), row = document.createElement("div");
+    row.className = "dep";
+    const ln = document.createElement("span"); ln.className = "line"; ln.setAttribute("style", lineStyle(d.line)); ln.textContent = d.line;
+    const to = document.createElement("span"); to.className = "to"; to.textContent = d.to;
+    const t = document.createElement("span"); t.className = "at"; t.textContent = pad(at.getHours()) + ":" + pad(at.getMinutes());
+    const mn = document.createElement("span"); mn.className = "min"; mn.textContent = m <= 0 ? "now" : m + " min";
+    row.append(ln, to, t, mn); box.appendChild(row);
+  });
+}
+function maybeRefetch(){
+  STOPS.forEach(s => {
+    const b = board[s.key], left = b.deps.filter(d => d.t > Date.now()).length;
+    if((left < 8 || Date.now() - b.lastOk > 3 * 3600000) && Date.now() - b.lastTry > 5 * 60000) loadStop(s);
+  });
+}
+drawTabs(); drawTrams(); STOPS.forEach(loadStop);
+setInterval(drawTrams, 10000); setInterval(maybeRefetch, 60000);
+
+/* ---------- German quiz (exam style: one question at a time, a/b/c, specific explanation) ---------- */
+const Q = {words: [], verbs: [], gram: [], plur: [], nouns: [], tails: new Map(), mode: "all", asked: 0, score: 0, right: 0, cur: null, answered: false, retry: [], recent: []};
+const GENDER = {der: "masculine", die: "feminine", das: "neuter"};
+const PLURAL_ONLY = new Set(["die Eltern","die Geschwister","die Ferien","die Nudeln","die Schuhe","die Verwandten","die Nachrichten","die Schulden","die Kosten","die Möbel","die Großeltern","die Unterlagen","die Überstunden","die Ausgaben","die Einnahmen","die Kenntnisse","die Beweise","die Medien","die Nebenkosten"]);
+const NATURAL = new Set(["der Mann","die Frau","der Vater","die Mutter","der Sohn","die Tochter","der Bruder","die Schwester","der Onkel","die Tante","der Großvater","die Großmutter","der Ehemann","die Ehefrau","der Freund","die Freundin","der Kollege","die Kollegin","der Chef","die Chefin","der Arzt","die Ärztin","der Lehrer","die Lehrerin","der Student","die Studentin","der Cousin","die Cousine","der Kunde","die Kundin"]);
+const CALENDAR = new Set(["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag","Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember","Frühling","Sommer","Herbst","Winter"]);
+const RULES = [ // [suffix, article, always?, extra condition]
+  ["ung","die",1],["heit","die",1],["keit","die",1],["schaft","die",1],["tion","die",1],["sion","die",1],["ität","die",1],
+  ["ling","der",1],["ismus","der",1],["chen","das",1],["lein","das",1],["eur","der",1],
+  ["ment","das",0],["nis","das",0],["ist","der",0],["ent","der",0],["or","der",0],["um","das",0],["ma","das",0],
+  ["ik","die",0],["ur","die",0],["ie","die",0],["ei","die",0],["in","die",1,n => /female/.test(n.en)],["e","die",0]
+].sort((a, b) => b[0].length - a[0].length);
+
+function articleWhy(n){
+  const b = n.bare.toLowerCase();
+  if(NATURAL.has(n.de)) return "People take the article that matches their sex (natural gender), so it is " + n.de + ".";
+  if(CALENDAR.has(n.bare)) return "Days of the week, months and seasons are always masculine, so it is " + n.de + ".";
+  for(let k = 3; k <= n.bare.length - 3; k++){
+    const tail = b.slice(k);
+    if(tail.length < 4 && tail !== "tag") continue;
+    const t = Q.tails.get(tail);
+    if(t && t !== n && t.art === n.art) return "Compound noun: the last part decides the article (" + t.de + " → " + n.de + ").";
+  }
+  for(const [s, a, always, cond] of RULES){
+    if(b.endsWith(s) && b.length > s.length + 1 && (!cond || cond(n))){
+      const g = GENDER[a];
+      if(a === n.art) return "Nouns ending in -" + s + (cond ? " that name a woman" : "") + " are " + (always ? "always " : "mostly ") + g + ", so it is " + n.de + ".";
+      return "Nouns ending in -" + s + " are mostly " + g + ", but " + n.de + " is an exception. Learn it together with its article.";
+    }
+  }
+  return "There is no reliable pattern for this word, so learn it together with its article: " + n.de + ".";
+}
+
+function kindOf(w){ return /^(der|die|das) /.test(w.de) ? "n" : /^to /.test(w.en) ? "v" : "o"; }
+function farFrom(list, idx, min){ const far = list.filter(x => Math.abs(x.i - idx) >= min); return far.length >= 12 ? far : list; }
+const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/* A question is {id, tag, prompt, hint, opts[], ans, why}; prompt contains ___ for the gap. */
+function make(id, tag, prompt, hint, correct, wrongs, why, keepOrder){
+  const o = [correct, ...wrongs];
+  if(!keepOrder) shuffle(o);
+  return {id, tag, prompt, hint, opts: o, ans: o.indexOf(correct), why};
+}
+
+function genVerb(){
+  const v = pick(Q.verbs), type = pick(["pres", "pp", "pp", "aux"]), a = v.ax === "s" ? "ist" : "hat";
+  const hint = "(" + v.i + " – " + v.e + ")";
+  if(type === "pres")
+    return make("v:" + v.i + ":p", "Verb · Präsens (er/sie/es)", v.ps, hint, v.er, [v.be, v.i],
+      v.np + " The form “" + v.i + "” belongs to wir/sie/Sie, not to er/sie/es.");
+  if(type === "pp")
+    return make("v:" + v.i + ":pp", "Verb · Perfekt (Partizip II)", v.fs.replace("{A}", a).replace("{P}", "___"), hint, v.pp, v.b, v.npp);
+  const why = v.aw || (v.k === "m" ? v.i + " describes movement from one place to another, so the Perfekt is formed with sein."
+    : v.k === "z" ? v.i + " describes a change of state, so the Perfekt is formed with sein."
+    : v.i + " is an activity or takes an object (no change of place or state), so the Perfekt is formed with haben.");
+  return make("v:" + v.i + ":a", "Verb · Perfekt (haben oder sein)", v.fs.replace("{A}", "___").replace("{P}", v.pp), hint, a, a === "ist" ? ["hat", "wird"] : ["ist", "wird"], why);
+}
+function genGrammar(){
+  const g = pick(Q.gram);
+  return make("g:" + g.s, "Grammar · " + g.c, g.s, "", g.o[0], [g.o[1], g.o[2]], g.w);
+}
+function genNoun(){
+  if(Q.plur.length && (!Q.nouns.length || Math.random() < .4)){
+    const p = pick(Q.plur);
+    return make("p:" + p.n, "Noun · Plural", p.n + "  →  die ___", "", p.p, p.b, p.w);
+  }
+  const n = pick(Q.nouns);
+  return make("a:" + n.de, "Noun · Article", "___ " + n.bare, "(" + n.en + ")", n.art, ["der", "die", "das"].filter(x => x !== n.art), articleWhy(n), true);
+}
+function genVocab(){
+  if(Q.nouns.length && Math.random() < .55){
+    for(let tries = 0; tries < 25; tries++){
+      const n = pick(Q.nouns), re = new RegExp("(^|[^\\p{L}])" + esc(n.bare) + "(?![\\p{L}])", "u");
+      if(!re.test(n.ex) || n.ex.split(/\s+/).length < 6) continue;
+      const sentence = n.ex.replace(re, (m, pre) => pre + "___");
+      const pool = farFrom(Q.nouns.filter(x => x.art === n.art && x.bare !== n.bare && x.en !== n.en && !n.ex.includes(x.bare)), n.i, 200);
+      const wr = shuffle(pool.slice()).slice(0, 2);
+      if(wr.length < 2) continue;
+      return make("w:g:" + n.de, "Vocabulary · Fill the gap", sentence, "(" + n.en + ")", n.bare, wr.map(x => x.bare),
+        "“" + n.bare + "” (" + n.en + ") fits the sentence. The other options mean: " + wr.map(x => x.bare + " = " + x.en).join("; ") + ". Learn it as " + n.de + ".");
+    }
+  }
+  const w = pick(Q.words), k = kindOf(w);
+  const pool = farFrom(Q.words.filter(x => kindOf(x) === k && x.en !== w.en && x.de !== w.de), w.i, 150);
+  const seen = new Set([w.en]), wr = [];
+  for(const x of shuffle(pool.slice())){ if(!seen.has(x.en)){ seen.add(x.en); wr.push(x); if(wr.length === 2) break; } }
+  const why = w.de + " = " + w.en + ". Example: " + w.ex;
+  if(Math.random() < .5) return make("w:m:" + w.de, "Vocabulary · Meaning", "Was bedeutet »" + w.de + "«?", "", w.en, wr.map(x => x.en), why);
+  return make("w:r:" + w.de, "Vocabulary · Which word?", "Welches Wort bedeutet »" + w.en + "«?", "", w.de, wr.map(x => x.de), why);
+}
+
+const GENS = {
+  all:     () => { const r = Math.random() * 8.8; return r < 3 ? "verb" : r < 6 ? "grammar" : r < 7.6 ? "noun" : "vocab"; },
+  verbs:   () => "verb", grammar: () => "grammar", nouns: () => "noun", vocab: () => "vocab"
+};
+const HAVE = {verb: () => Q.verbs.length, grammar: () => Q.gram.length, noun: () => Q.nouns.length || Q.plur.length, vocab: () => Q.words.length >= 20};
+const GEN = {verb: genVerb, grammar: genGrammar, noun: genNoun, vocab: genVocab};
+
+function nextQuestion(){
+  let q = null;
+  const due = Q.retry.findIndex(r => r.due <= Q.asked);
+  if(due >= 0){ q = Q.retry.splice(due, 1)[0].q; q = Object.assign({}, q, {tag: "Retry · " + q.tag.replace(/^Retry · /, "")}); }
+  else{
+    for(let tries = 0; tries < 12 && !q; tries++){
+      let kind = GENS[Q.mode](); if(!HAVE[kind]()) continue;
+      const c = GEN[kind]();
+      if(c.opts.length === 3 && new Set(c.opts).size === 3 && !Q.recent.includes(c.id)) q = c;
+    }
+    if(!q) q = (HAVE.grammar() ? genGrammar() : null);
+  }
+  if(!q){ $("qprompt").textContent = "No questions loaded. Check that words.json, verbs.json, grammar.json and plurals.json are in the repo."; return; }
+  Q.recent.push(q.id); if(Q.recent.length > 30) Q.recent.shift();
+  Q.cur = q; Q.answered = false; renderQuestion();
+}
+function renderQuestion(){
+  const q = Q.cur;
+  $("qtag").textContent = q.tag + " — choose a, b or c";
+  const box = $("qprompt"); box.innerHTML = "";
+  q.prompt.split("___").forEach((part, i, arr) => {
+    box.appendChild(document.createTextNode(part));
+    if(i < arr.length - 1){ const g = document.createElement("span"); g.className = "gap"; g.id = "gap"; g.textContent = " "; box.appendChild(g); }
+  });
+  $("qhint").textContent = q.hint;
+  const o = $("opts"); o.innerHTML = "";
+  q.opts.forEach((t, i) => {
+    const b = document.createElement("button"); b.className = "opt"; b.dataset.i = i;
+    const l = document.createElement("span"); l.className = "l"; l.textContent = "abc"[i];
+    const s = document.createElement("span"); s.textContent = t;
+    b.append(l, s); o.appendChild(b);
+  });
+  const r = $("res"); r.innerHTML = "<b>Not quite. The answer is a) " + q.opts[q.ans] + "</b><span>" + q.why + "</span>"; r.className = "res show measure";
+  fitQuiz();
+  r.className = "res"; r.innerHTML = ""; $("next").className = "next";
+}
+$("opts").addEventListener("click", e => {
+  const b = e.target.closest(".opt"); if(!b || Q.answered || !Q.cur) return;
+  Q.answered = true; Q.asked++;
+  const q = Q.cur, pickI = +b.dataset.i, good = pickI === q.ans;
+  if(good){ Q.right++; } else { Q.retry.push({q, due: Q.asked + 4}); }
+  [...$("opts").children].forEach((x, i) => x.classList.add(i === q.ans ? "ok" : i === pickI ? "bad" : "dim"));
+  const gap = $("gap"); if(gap){ gap.textContent = q.opts[q.ans]; gap.classList.add("ok"); }
+  const res = $("res"); res.innerHTML = "";
+  const v = document.createElement("b"); v.textContent = good ? "Richtig." : "Not quite. The answer is " + "abc"[q.ans] + ") " + q.opts[q.ans];
+  const w = document.createElement("span"); w.textContent = q.why;
+  res.append(v, w); res.className = "res show " + (good ? "right" : "wrong");
+  $("next").className = "next show";
+  $("score").textContent = Q.right + " / " + Q.asked + " correct";
+  fitQuiz();
+});
+function fitQuiz(){
+  const b = $("qbody"); if(!b) return;
+  let z = 1; b.style.zoom = 1;
+  while(b.scrollHeight > b.clientHeight + 1 && z > .55){ z -= .05; b.style.zoom = z; }
+  if(b.scrollHeight > b.clientHeight + 1) b.style.overflowY = "auto"; else b.style.overflowY = "hidden";
+}
+window.addEventListener("resize", fitQuiz);
+$("next").addEventListener("click", nextQuestion);
+
+const MODES = [["all", "All"], ["verbs", "Verbs"], ["grammar", "Grammar"], ["nouns", "Nouns"], ["vocab", "Words"]];
+function drawPills(){
+  const p = $("pills"); p.innerHTML = "";
+  MODES.forEach(([k, label]) => {
+    const b = document.createElement("button"); b.className = "pill"; b.textContent = label;
+    b.setAttribute("aria-pressed", Q.mode === k ? "true" : "false");
+    b.onclick = () => { Q.mode = k; Q.retry = []; drawPills(); nextQuestion(); };
+    p.appendChild(b);
+  });
+}
+async function getJSON(u){ const r = await fetch(u, {cache: "no-cache"}); if(!r.ok) throw new Error(u); return r.json(); }
+Promise.all(["words.json", "verbs.json", "grammar.json", "plurals.json"].map(u => getJSON(u).catch(() => []))).then(([w, v, g, p]) => {
+  Q.words = w.map((x, i) => Object.assign({i}, x)); Q.verbs = v; Q.gram = g; Q.plur = p;
+  Q.nouns = Q.words.map(x => { const m = /^(der|die|das) (.+)$/.exec(x.de); return m && !PLURAL_ONLY.has(x.de) ? {de: x.de, en: x.en, ex: x.ex, i: x.i, art: m[1], bare: m[2]} : null; }).filter(Boolean);
+  Q.nouns.forEach(n => { const k = n.bare.toLowerCase(); if(!Q.tails.has(k)) Q.tails.set(k, n); });
+  drawPills(); nextQuestion();
+  window.__dbg = {Q, articleWhy, GEN};
+});
+drawPills();
+
+/* ---------- Keep the screen on ---------- */
+async function keepAwake(){ try{ if("wakeLock" in navigator) await navigator.wakeLock.request("screen"); }catch(e){} }
+keepAwake(); document.addEventListener("visibilitychange", () => { if(!document.hidden) keepAwake(); });
+
+/* ---------- Pages: swipe between dashboard and to-do ---------- */
+const pager = $("pager"), dotBtns = [...$("dots").children];
+function syncDots(){ const i = Math.round(pager.scrollLeft / Math.max(1, pager.clientWidth)); dotBtns.forEach((b, k) => b.setAttribute("aria-current", k === i ? "true" : "false")); }
+pager.addEventListener("scroll", syncDots, {passive: true});
+dotBtns.forEach((b, k) => b.addEventListener("click", () => pager.scrollTo({left: k * pager.clientWidth, behavior: "smooth"})));
+window.addEventListener("resize", () => { syncDots(); });
+
+/* ---------- To-do list, reminders + notepad (saved on this iPad) ---------- */
+const TKEY = "dash.todos.v1";
+const WHO = {mauricio: {n: "Mauricio", c: "#6cb4ff"}, susanna: {n: "Susanna", c: "#f08fc0"}, general: {n: "General", c: "#8fd6b8"}};
+const PRI = {high: {n: "High", c: "#ff6b6b", o: 0}, medium: {n: "Medium", c: "#f2b45a", o: 1}, low: {n: "Low", c: "#8da2c0", o: 2}};
+const KINDS = {todo: {n: "To-do", c: "#eef1f6"}, reminder: {n: "Reminder", c: "#eef1f6"}};
+let todos = [];
+try{ todos = JSON.parse(localStorage.getItem(TKEY) || "[]").filter(t => t && typeof t.text === "string")
+  .map(t => ({id: t.id, text: t.text, done: !!t.done, kind: KINDS[t.kind] ? t.kind : "todo", who: WHO[t.who] ? t.who : "general", pri: PRI[t.pri] ? t.pri : "medium"})); }catch(e){ todos = []; }
+const saveTodos = () => { try{ localStorage.setItem(TKEY, JSON.stringify(todos)); }catch(e){} };
+const cards = {}; document.querySelectorAll(".todos").forEach(c => cards[c.dataset.kind] = c);
+function renderTodos(scrollKind){
+  Object.keys(KINDS).forEach(kind => {
+    const card = cards[kind], box = card.querySelector(".tlist"), keep = box.scrollTop; box.innerHTML = "";
+    const items = todos.filter(t => t.kind === kind).sort((a, b) => PRI[a.pri].o - PRI[b.pri].o);   // stable: same priority keeps the order added
+    if(!items.length){ const e = document.createElement("div"); e.className = "tempty"; e.textContent = kind === "todo" ? "Nothing to do. Write a note and add it as a to-do." : "No reminders. Write a note and add it as a reminder."; box.appendChild(e); }
+    items.forEach(t => {
+      const r = document.createElement("button"), w = WHO[t.who], p = PRI[t.pri];
+      r.className = "todo" + (t.done ? " done" : ""); r.dataset.id = t.id; r.style.setProperty("--c", w.c);
+      r.setAttribute("role", "checkbox"); r.setAttribute("aria-checked", t.done ? "true" : "false");
+      const b = document.createElement("span"); b.className = "box"; b.innerHTML = IC("check");
+      const x = document.createElement("span"); x.className = "tx"; x.textContent = t.text;
+      const ch = document.createElement("span"); ch.className = "chips";
+      const c1 = document.createElement("span"); c1.className = "chip"; c1.style.setProperty("--c", w.c); c1.textContent = w.n;
+      const c2 = document.createElement("span"); c2.className = "chip p"; c2.style.setProperty("--c", p.c); c2.textContent = p.n;
+      ch.append(c2, c1); r.append(b, x, ch); box.appendChild(r);
+    });
+    const open = items.filter(t => !t.done).length, done = items.length - open;
+    card.querySelector(".tcount").textContent = items.length ? open + " open" + (done ? " · " + done + " done" : "") : "";
+    card.querySelector(".refresh").classList.toggle("idle", !done);
+    box.scrollTop = scrollKind === kind ? box.scrollHeight : keep;
+  });
+}
+document.querySelectorAll(".todos").forEach(card => {
+  card.querySelector(".tlist").addEventListener("click", e => {
+    const r = e.target.closest(".todo"); if(!r) return;
+    const t = todos.find(x => String(x.id) === r.dataset.id); if(!t) return;
+    t.done = !t.done; saveTodos(); renderTodos();
+  });
+  card.querySelector(".refresh").addEventListener("click", () => {
+    const rows = [...card.querySelectorAll(".todo.done")]; if(!rows.length) return;
+    rows.forEach(r => r.classList.add("gone"));
+    setTimeout(() => { todos = todos.filter(t => !(t.kind === card.dataset.kind && t.done)); saveTodos(); renderTodos(); }, 360);
+  });
+});
+paintIcons();
+
+/* composer */
+const sel = {kind: null, who: "general", pri: "medium"};
+function buildSeg(id, key, map){
+  const g = $(id); g.innerHTML = "";
+  Object.keys(map).forEach(v => {
+    const b = document.createElement("button"); b.dataset.v = v; b.style.setProperty("--c", map[v].c);
+    if(key === "who" || key === "pri"){ const d = document.createElement("i"); d.className = "dot"; b.appendChild(d); }
+    b.appendChild(document.createTextNode(map[v].n)); g.appendChild(b);
+  });
+  g.addEventListener("click", e => { const b = e.target.closest("button"); if(!b) return; sel[key] = b.dataset.v; syncComposer(); });
+}
+buildSeg("g-kind", "kind", KINDS); buildSeg("g-who", "who", WHO); buildSeg("g-pri", "pri", PRI);
+function syncComposer(){
+  [["g-kind", "kind"], ["g-who", "who"], ["g-pri", "pri"]].forEach(([id, k]) => [...$(id).children].forEach(b => b.setAttribute("aria-pressed", b.dataset.v === sel[k] ? "true" : "false")));
+  const has = !!$("note").value.trim(), ok = has && !!sel.kind;
+  $("addnote").disabled = !ok;
+  $("padtip").textContent = !has ? "Write with the Pencil or type" : !sel.kind ? "Now choose To-do or Reminder" : "Ready. Tap Add";
+}
+function addNote(){
+  const v = $("note").value.replace(/\s+/g, " ").trim(); if(!v) return;
+  if(!sel.kind){ const g = $("g-kind"); g.classList.remove("nudge"); void g.offsetWidth; g.classList.add("nudge"); return; }
+  const kind = sel.kind;
+  todos.push({id: Date.now() + Math.random().toString(36).slice(2, 6), text: v, done: false, kind, who: sel.who, pri: sel.pri});
+  saveTodos(); $("note").value = ""; sel.kind = null; sel.who = "general"; sel.pri = "medium";
+  syncComposer(); renderTodos(); const box = cards[kind].querySelector(".tlist"); const row = [...box.children].find(r => r.dataset.id === todos[todos.length - 1].id); if(row) row.scrollIntoView({block: "nearest"});
+}
+$("addnote").addEventListener("click", addNote);
+$("note").addEventListener("input", syncComposer);
+$("note").addEventListener("keydown", e => { if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); addNote(); } });
+syncComposer(); renderTodos();
+</script>
+</body>
+</html>
