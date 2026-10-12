@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dashboard">
+<title>Dashboard</title>
+<style>
+:root{--bg:#080b11;--card:#101622;--card2:#172033;--line:rgba(160,185,230,.13);--fg:#eef1f6;--dim:#8794ab;--warm:#f2b45a;--cool:#6cb4ff;--ok:#41c98f;--bad:#ff7070}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{background:radial-gradient(90% 70% at 12% 0%,#17233d 0%,rgba(23,35,61,0) 60%),radial-gradient(70% 60% at 100% 100%,#1d1a33 0%,rgba(29,26,51,0) 60%),var(--bg);
+  color:var(--fg);font-family:-apple-system,"SF Pro Display",system-ui,sans-serif;
+  touch-action:manipulation;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+.pager{position:fixed;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.pager::-webkit-scrollbar{display:none}
+.page{flex:0 0 100%;width:100%;height:100%;scroll-snap-align:start;scroll-snap-stop:always;display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);gap:2.4vmin;
+  padding:calc(3vmin + env(safe-area-inset-top)) calc(3.4vmin + env(safe-area-inset-right)) calc(4.6vmin + env(safe-area-inset-bottom)) calc(3.4vmin + env(safe-area-inset-left))}
+.page.todopage{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr) 33vmin}
+.dots{position:fixed;left:50%;bottom:calc(.6vmin + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:.4vmin;z-index:5}
+.dots button{width:5vmin;height:3.6vmin;background:none;border:0;display:grid;place-items:center;padding:0}
+.dots button::before{content:"";width:1.1vmin;height:1.1vmin;border-radius:99px;background:#4a5670;transition:all .25s}
+.dots button[aria-current=true]::before{width:3.2vmin;background:var(--fg)}
+button{font:inherit;color:inherit;cursor:pointer}
+.col{display:flex;flex-direction:column;gap:2.4vmin;min-width:0;min-height:0}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.012)),var(--card);border:1px solid var(--line);border-radius:2.6vmin;padding:2.2vmin 2.4vmin;box-shadow:0 .4vmin 2vmin rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05)}
+
+/* ---- left: clock + weather ---- */
+.time{font-size:min(20vmin,14vw);font-weight:200;background:linear-gradient(180deg,#fff 30%,#b9c6dd);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:.95;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.date{font-size:3vmin;color:var(--dim);margin-top:1.2vmin}
+.now{display:flex;align-items:center;gap:2vmin}
+.now .icon{font-size:11vmin;line-height:1;flex:none}
+svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5}
+.sun{flex-wrap:wrap;row-gap:1vmin;justify-content:space-between}
+.sun span{display:flex;align-items:center;gap:1vmin}
+.uv .uvk{font-style:normal;font-size:1.9vmin;font-weight:700;letter-spacing:.06em;color:var(--dim)}
+.uv em{font-style:normal;font-size:1.7vmin;font-weight:600;border-radius:99px;padding:.4vmin 1.1vmin;color:var(--c,var(--dim));background:color-mix(in srgb,var(--c,#8794ab) 16%,transparent)}.sun svg.ic{font-size:3.8vmin}
+.now .temp{font-size:10vmin;font-weight:200;color:var(--warm);line-height:1}
+.nowtxt{min-width:0}
+.now .desc{font-size:2.9vmin}
+.now .meta{font-size:2.2vmin;color:var(--dim);margin-top:.5vmin}
+.sun{display:flex;gap:2.4vmin;margin-top:1.8vmin;padding-top:1.6vmin;border-top:1px solid var(--line);font-size:2.6vmin;color:var(--dim)}
+.sun b{color:var(--fg);font-weight:500;font-variant-numeric:tabular-nums;margin-left:.6vmin}
+.hours{flex:1;min-height:0;display:grid;grid-template-columns:repeat(6,1fr);gap:1vmin}
+.cell{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.01)),var(--card);border:1px solid var(--line);border-radius:2.2vmin;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1vmin;padding:1vmin .2vmin;min-height:0}
+.cell .l{font-size:2vmin;color:var(--dim);font-variant-numeric:tabular-nums}
+.cell .i{font-size:6vmin;line-height:1}
+.cell .t{font-size:3.2vmin}
+.cell .p{font-size:1.7vmin;color:var(--dim)}
+#foot{font-size:1.5vmin;color:var(--dim);line-height:1.4}
+
+/* ---- right: trams ---- */
+.trams{padding:1.6vmin 2.2vmin 1.2vmin}
+.tabs{display:flex;gap:1vmin;margin-bottom:1vmin}
+.tab{background:transparent;border:1px solid transparent;border-radius:99px;padding:.9vmin 2vmin;font-size:2.2vmin;color:var(--dim)}
+.tab[aria-selected=true]{background:var(--card2);border-color:var(--line);color:var(--fg)}
+.dep{display:grid;grid-template-columns:8vmin minmax(0,1fr) auto 12vmin;align-items:center;gap:1.8vmin;height:5.2vmin;font-size:2.6vmin}
+.line{justify-self:start;min-width:7.4vmin;padding:.4vmin 1.1vmin;border-radius:1vmin;text-align:center;font-weight:700;font-size:2.4vmin;line-height:1.2}
+.dep .to{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dep .at{color:var(--dim);font-size:2.2vmin;font-variant-numeric:tabular-nums}
+.dep .min{text-align:right;font-variant-numeric:tabular-nums}
+.empty{color:var(--dim);font-size:2.3vmin;padding:1.4vmin 0}
+
+/* ---- right: quiz ---- */
+.quiz{flex:1;min-height:0;display:flex;flex-direction:column;padding:1.6vmin 2.2vmin 1.8vmin}
+.qhead{display:flex;align-items:center;gap:1.6vmin;flex-wrap:wrap;margin-bottom:1.2vmin}
+.qtitle{font-size:2.3vmin;font-weight:600;white-space:nowrap}
+.pills{display:flex;gap:.7vmin;flex:1;min-width:0;flex-wrap:wrap}
+.pill{background:transparent;border:1px solid var(--line);border-radius:99px;padding:.6vmin 1.4vmin;font-size:1.8vmin;color:var(--dim);white-space:nowrap}
+.pill[aria-pressed=true]{background:var(--card2);color:var(--fg);border-color:#3a4a66}
+.score{font-size:2vmin;color:var(--dim);white-space:nowrap;font-variant-numeric:tabular-nums}
+.qbody{flex:1;min-height:0;overflow:hidden}
+.qtag{font-size:1.9vmin;color:var(--warm);margin-bottom:.8vmin}
+.qprompt{font-size:3.3vmin;line-height:1.3}
+.gap{display:inline-block;min-width:9vmin;border-bottom:.35vmin solid var(--dim);text-align:center;margin:0 .4vmin;line-height:1.1}
+.gap.ok{border-color:var(--ok);color:var(--ok);font-weight:600}
+.qhint{font-size:2.1vmin;color:var(--dim);margin-top:.7vmin;min-height:2.6vmin}
+.opts{display:flex;flex-direction:column;gap:1vmin;margin-top:1.2vmin}
+.opt{display:flex;align-items:center;gap:1.6vmin;width:100%;text-align:left;background:var(--card2);border:1px solid var(--line);border-radius:1.4vmin;padding:1.1vmin 1.6vmin;font-size:2.7vmin}
+.opt .l{flex:none;width:3.6vmin;height:3.6vmin;border-radius:50%;border:1px solid #3a4560;display:grid;place-items:center;font-size:2vmin;color:var(--dim)}
+.opt.ok{border-color:var(--ok);background:rgba(65,201,143,.12)}
+.opt.ok .l{background:var(--ok);border-color:var(--ok);color:#06241a;font-weight:700}
+.opt.bad{border-color:var(--bad);background:rgba(255,112,112,.1)}
+.opt.bad .l{background:var(--bad);border-color:var(--bad);color:#2a0909;font-weight:700}
+.opt.dim{opacity:.4}
+.res{margin-top:1.4vmin;border-left:.4vmin solid var(--line);padding:.3vmin 0 .3vmin 1.6vmin;font-size:2.3vmin;line-height:1.4;display:none}
+.res.show{display:block}.res.measure{visibility:hidden}
+.res.right{border-color:var(--ok)}.res.wrong{border-color:var(--bad)}
+.res b{display:block;margin-bottom:.3vmin}
+.qfoot{display:flex;justify-content:flex-end;height:6vmin;margin-top:1vmin}
+.next{visibility:hidden;background:var(--fg);color:var(--bg);border:0;border-radius:1.4vmin;padding:0 4vmin;font-size:2.6vmin;font-weight:600}
+.next.show{visibility:visible}
+
+
+/* ---- to-do page ---- */
+.todocol{display:contents}
+.todos{display:flex;flex-direction:column;min-height:0;min-width:0;padding:2vmin 2.4vmin 1vmin;--a:#f2b45a;position:relative;overflow:hidden;
+  background:radial-gradient(90% 38% at 0% 0%,color-mix(in srgb,var(--a) 13%,transparent),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.012)),var(--card)}
+.todos[data-kind=reminder]{--a:#6cb4ff}
+.thead{display:flex;align-items:center;gap:1.4vmin;margin-bottom:1vmin;padding-bottom:1.2vmin;border-bottom:1px solid var(--line)}
+.ttitle{font-size:3.2vmin;font-weight:600;letter-spacing:-.01em;display:flex;align-items:center;gap:1.4vmin}
+.ttitle i{display:grid;place-items:center;width:5.4vmin;height:5.4vmin;border-radius:1.6vmin;background:color-mix(in srgb,var(--a) 18%,transparent)}
+.ttitle svg.ic{font-size:3vmin;stroke:var(--a)}
+.tcount{font-size:1.9vmin;color:var(--dim);flex:1}
+.refresh{display:flex;align-items:center;gap:.9vmin;background:var(--card2);border:1px solid var(--line);border-radius:99px;padding:.8vmin 1.8vmin;font-size:2vmin;color:var(--fg);transition:opacity .2s}
+.refresh svg.ic{font-size:2.4vmin;stroke:var(--a)}
+.refresh.idle{opacity:.4}
+.tlist{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.todo{display:flex;align-items:center;gap:1.6vmin;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:1.3vmin .2vmin;font-size:2.7vmin;line-height:1.2;transition:opacity .3s,max-height .35s,padding .35s;max-height:30vmin}
+.todo:last-child{border-bottom:0}
+.todo .box{flex:none;width:3.8vmin;height:3.8vmin;border-radius:50%;border:.3vmin solid var(--c);display:grid;place-items:center;transition:all .2s}
+.todo .box svg.ic{font-size:2.5vmin;stroke:#06141f;stroke-width:2.6;opacity:0}
+.todo .tx{min-width:0;flex:1;overflow-wrap:anywhere}
+.todo .chips{flex:none;display:flex;align-items:center;gap:.9vmin}
+.chip{display:inline-flex;align-items:center;gap:.6vmin;border-radius:99px;padding:.45vmin 1.2vmin;font-size:1.7vmin;font-weight:600;color:var(--c);background:color-mix(in srgb,var(--c) 16%,transparent);white-space:nowrap}
+.chip.p::before{content:"";width:1vmin;height:1vmin;border-radius:50%;background:var(--c)}
+.todo.done{color:var(--dim)}
+.todo.done .tx{text-decoration:line-through;text-decoration-thickness:.25vmin}
+.todo.done .box{background:var(--c)}
+.todo.done .box svg.ic{opacity:1}
+.todo.done .chips{opacity:.45}
+.todo.gone{opacity:0;max-height:0;padding-top:0;padding-bottom:0;overflow:hidden}
+.tempty{color:var(--dim);font-size:2.3vmin;padding:2.6vmin 1vmin;text-align:center}
+.pad{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:3vmin;min-height:0;padding:2vmin 2.4vmin;
+  background:radial-gradient(60% 120% at 0% 100%,rgba(242,180,90,.10),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.012)),var(--card);border-color:rgba(242,180,90,.2)}
+.paper{display:flex;flex-direction:column;min-height:0;background:rgba(5,8,14,.45);border:1px solid var(--line);border-radius:2vmin;padding:1.4vmin 2vmin 1vmin}
+.padtitle{font-size:1.8vmin;color:var(--warm);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4vmin}
+#note{flex:1;min-height:0;width:100%;resize:none;background:repeating-linear-gradient(transparent 0 5.6vmin,rgba(160,185,230,.14) 5.6vmin calc(5.6vmin + 1px));background-attachment:local;border:0;outline:0;color:var(--fg);font:inherit;font-size:3.1vmin;line-height:5.6vmin;padding:0;-webkit-user-select:text;user-select:text;caret-color:var(--warm)}
+#note::placeholder{color:#66748f;font-weight:300}
+.ctl{display:flex;flex-direction:column;justify-content:center;gap:1.6vmin;min-width:0;min-height:0}
+.grp{display:flex;align-items:center;gap:1.6vmin;min-width:0}
+.grp .seg{flex:1;min-width:0}
+.grp>label{flex:none;width:9.5vmin;font-size:2vmin;color:var(--dim)}
+.seg{display:flex;gap:1vmin}
+.seg button{flex:1;height:5.8vmin;min-width:0;border-radius:1.4vmin;border:1px solid var(--line);background:rgba(255,255,255,.03);font-size:2.1vmin;padding:0 .6vmin;color:var(--dim);display:flex;align-items:center;justify-content:center;gap:.7vmin;transition:all .15s}
+.seg button .dot{flex:none;width:1.3vmin;height:1.3vmin;border-radius:50%;background:var(--c)}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--c);background:color-mix(in srgb,var(--c) 22%,transparent);font-weight:600}
+.seg.nudge{animation:nudge .5s}
+@keyframes nudge{0%,100%{transform:none}25%{transform:translateX(-.8vmin)}75%{transform:translateX(.8vmin)}}
+.padfoot{flex:none;display:flex;align-items:center;justify-content:space-between;gap:2vmin;min-width:0;margin-top:.6vmin}
+.padtip{font-size:2vmin;color:var(--dim);min-width:0;flex:1}
+.addbtn{flex:none;background:linear-gradient(180deg,#f7c777,#eaa443);color:#2a1a00;border:0;border-radius:1.6vmin;height:6.4vmin;padding:0 5vmin;font-size:2.7vmin;font-weight:700;box-shadow:0 .5vmin 1.6vmin rgba(242,180,90,.25);transition:opacity .2s}
+.addbtn:disabled{opacity:.35}
+
+
+/* ---- week planner ---- */
+.page.planpage{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:1.8vmin}
+.phead{display:flex;align-items:center;gap:2.4vmin;padding:0 .6vmin}
+.ptitle{font-size:4.2vmin;font-weight:600;letter-spacing:-.02em}
+.prange{font-size:2.4vmin;color:var(--dim);margin-left:1.4vmin;font-weight:400;letter-spacing:0}
+.pnav{display:flex;align-items:center;gap:1vmin;margin-left:auto}
+.pnav button{height:5.6vmin;min-width:5.6vmin;border-radius:99px;border:1px solid var(--line);background:var(--card2);font-size:2.3vmin;padding:0 2vmin;display:grid;place-items:center}
+.pnav button svg.ic{font-size:2.6vmin;stroke:var(--fg)}
+.legend{display:flex;gap:2vmin;font-size:1.9vmin;color:var(--dim);margin-left:1vmin}
+.legend span{display:flex;align-items:center;gap:.8vmin}.legend i{width:1.3vmin;height:1.3vmin;border-radius:50%;background:var(--c)}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1.2vmin;min-height:0}
+.day{display:flex;flex-direction:column;min-height:0;min-width:0;padding:1.4vmin 1.2vmin 1vmin;border-radius:2.2vmin;border:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.012)),var(--card);box-shadow:0 .4vmin 1.6vmin rgba(0,0,0,.3)}
+.day.we{background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.008)),#0d121c}
+.day.past .dhead{opacity:.5}
+.day.today{border-color:rgba(242,180,90,.55);background:radial-gradient(100% 30% at 50% 0%,rgba(242,180,90,.16),transparent 80%),linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.015)),var(--card);box-shadow:0 0 0 1px rgba(242,180,90,.25),0 .6vmin 2.4vmin rgba(242,180,90,.12)}
+.dhead{display:flex;align-items:baseline;justify-content:space-between;padding:0 .4vmin 1vmin;border-bottom:1px solid var(--line);margin-bottom:.8vmin}
+.dname{font-size:2vmin;color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
+.dnum{font-size:3.6vmin;font-weight:300;line-height:1}
+.day.today .dname{color:var(--warm)}.day.today .dnum{color:var(--warm);font-weight:500}
+.dlist{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:.8vmin}
+.ent{display:flex;align-items:flex-start;gap:.9vmin;border-radius:1.2vmin;background:color-mix(in srgb,var(--c) 11%,transparent);border:0;border-left:.55vmin solid var(--c);padding:.9vmin .8vmin .9vmin .9vmin;text-align:left;width:100%;font-size:2.1vmin;line-height:1.22;flex:none}
+.ent .tm{display:block;font-size:1.7vmin;color:var(--c);font-weight:600;font-variant-numeric:tabular-nums;margin-bottom:.2vmin}
+.ent .tx{display:block;min-width:0;overflow-wrap:anywhere}
+.ent .ck{flex:none;width:2.8vmin;height:2.8vmin;border-radius:50%;border:.26vmin solid var(--c);display:grid;place-items:center;margin-top:.1vmin}
+.ent .ck svg.ic{font-size:1.9vmin;stroke:#06141f;stroke-width:2.8;opacity:0}
+.ent .body{flex:1;min-width:0}
+.ent.done{opacity:.5}.ent.done .tx{text-decoration:line-through}.ent.done .ck{background:var(--c)}.ent.done .ck svg.ic{opacity:1}
+.dadd{flex:none;margin-top:.8vmin;height:5vmin;border-radius:1.2vmin;border:1px dashed #36445f;background:none;color:var(--dim);font-size:2.6vmin;line-height:1}
+.scrim{position:fixed;inset:0;z-index:20;background:rgba(4,6,10,.62);-webkit-backdrop-filter:blur(.8vmin);backdrop-filter:blur(.8vmin);display:flex;justify-content:center;align-items:flex-start;padding-top:calc(4vmin + env(safe-area-inset-top))}
+.scrim[hidden]{display:none}
+.sheet{width:min(104vmin,88vw);display:flex;flex-direction:column;gap:1.6vmin;padding:2.4vmin 2.8vmin;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),#141b29;box-shadow:0 2vmin 6vmin rgba(0,0,0,.6)}
+.stitle{font-size:2.8vmin;font-weight:600}
+.stitle small{font-size:2vmin;color:var(--dim);font-weight:400;margin-left:1vmin}
+#pl-text{height:12.4vmin;width:100%;resize:none;background:repeating-linear-gradient(transparent 0 6vmin,rgba(160,185,230,.14) 6vmin calc(6vmin + 1px));background-attachment:local;border:0;outline:0;color:var(--fg);font:inherit;font-size:3.2vmin;line-height:6vmin;padding:0;-webkit-user-select:text;user-select:text;caret-color:var(--warm)}
+#pl-text::placeholder{color:#66748f;font-weight:300}
+.tmrow{display:flex;align-items:center;gap:1.4vmin;flex:1}
+#pl-time{height:5.8vmin;border-radius:1.4vmin;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--fg);font:inherit;font-size:2.6vmin;padding:0 1.6vmin;color-scheme:dark;-webkit-user-select:text;user-select:text}
+.ghost{height:5.8vmin;border-radius:1.4vmin;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--dim);font-size:2.1vmin;padding:0 2.2vmin}
+.danger{height:6.4vmin;border-radius:1.6vmin;border:1px solid rgba(255,107,107,.4);background:rgba(255,107,107,.1);color:#ff8a8a;font-size:2.3vmin;padding:0 3vmin}
+.sfoot{display:flex;align-items:center;gap:1.4vmin;margin-top:.4vmin}.sfoot .sp{flex:1}
+#pl-save:disabled{opacity:.35}
+
+/* ---- engineering quiz page ---- */
+.page.quizpage{grid-template-columns:minmax(0,1.65fr) minmax(0,.85fr);grid-template-rows:minmax(0,1fr)}
+.zq{display:flex;flex-direction:column;min-height:0;min-width:0;padding:1.8vmin 2.4vmin 1.8vmin;position:relative}
+.zhead{display:flex;flex-wrap:wrap;align-items:center;gap:.9vmin 1.6vmin;margin-bottom:1.2vmin}
+.zhead .pills{flex:none}
+.zsp{flex:1}
+.zdrill{display:inline-flex;align-items:center;gap:.8vmin;border-radius:99px;border:1px solid var(--c,var(--line));color:var(--c,var(--fg));padding:.6vmin 1.3vmin;font-size:1.8vmin;background:transparent;max-width:34vmin;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.zdrill svg.ic{font-size:1.9vmin;stroke:currentColor;flex:none}
+.zdrill[hidden]{display:none}
+.zbody{flex:1;min-height:0;overflow:hidden}
+.ztag{font-size:1.9vmin;color:var(--c,var(--warm));margin-bottom:.8vmin}
+.zcode{font:2.2vmin/1.45 ui-monospace,"SF Mono",Menlo,monospace;background:#0a0f19;border:1px solid var(--line);border-radius:1.4vmin;padding:1.2vmin 1.6vmin;margin:1vmin 0 .4vmin;white-space:pre;overflow:hidden;color:#cfe0ff;tab-size:4}
+.zq .opt{font-size:2.5vmin;padding:1vmin 1.6vmin}
+.zq .res{font-size:2.2vmin}
+.zfoot{display:flex;align-items:center;gap:1.2vmin;height:6vmin;margin-top:1vmin}
+.zfoot .sp{flex:1}
+.zrate{display:flex;gap:1vmin}
+.zrate button{width:6vmin;height:6vmin;border-radius:1.4vmin;border:1px solid var(--line);background:rgba(255,255,255,.03);display:grid;place-items:center;padding:0}
+.zrate svg.ic{font-size:2.8vmin;stroke:var(--dim)}
+.zrate button[aria-pressed=true]{border-color:var(--c);background:color-mix(in srgb,var(--c) 16%,transparent)}
+.zrate button[aria-pressed=true] svg.ic{stroke:var(--c)}
+#z-up{--c:#41c98f}#z-down{--c:#ff9a6b}#z-flag{--c:#ff7070}
+.zfoot .ghost{height:6vmin}
+.zpop{position:absolute;left:2.4vmin;bottom:9.4vmin;z-index:6;width:min(54vmin,80%);display:flex;flex-direction:column;gap:.9vmin;padding:1.4vmin;background:#1a2336;border:1px solid var(--line);border-radius:1.8vmin;box-shadow:0 1.6vmin 4vmin rgba(0,0,0,.55)}
+.zpop[hidden]{display:none}
+.zpop .t{font-size:1.9vmin;color:var(--dim);padding:0 .6vmin .3vmin}
+.zpop button{height:5.4vmin;border-radius:1.2vmin;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--fg);font-size:2.2vmin;text-align:left;padding:0 1.6vmin}
+.zpop button[aria-pressed=true]{border-color:#ff7070;background:rgba(255,112,112,.14)}
+.zc{display:flex;flex-direction:column;min-height:0;min-width:0;padding:2vmin 2.2vmin 1.8vmin}
+.zc h3{font-size:2.5vmin;font-weight:600}
+.zstat{font-size:1.9vmin;color:var(--dim);margin:.6vmin 0 1.4vmin;line-height:1.4;font-variant-numeric:tabular-nums}
+.zlist{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:.9vmin}
+.zrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.5vmin 1vmin;align-items:center;text-align:left;width:100%;padding:1.1vmin 1.4vmin;border-radius:1.4vmin;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--fg);font-size:2vmin}
+.zrow[aria-pressed=true]{border-color:var(--c);background:color-mix(in srgb,var(--c) 12%,transparent)}
+.zrow .zn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.zrow .zv{color:var(--dim);font-size:1.8vmin;font-variant-numeric:tabular-nums}
+.zrow .zbar{grid-column:1/-1;height:.7vmin;border-radius:99px;background:rgba(160,185,230,.12);overflow:hidden}
+.zrow .zbar b{display:block;height:100%;border-radius:99px;background:var(--c)}
+.zcb{margin-top:1.2vmin;height:6vmin;border-radius:1.4vmin;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--fg);font-size:2.2vmin;display:flex;align-items:center;justify-content:center;gap:1vmin}
+.zcb svg.ic{font-size:2.4vmin;stroke:var(--fg)}
+.zcb i{font-style:normal;font-size:1.7vmin;border-radius:99px;padding:.2vmin 1vmin;background:rgba(255,112,112,.18);color:#ff9a9a}
+#zf-text{height:44vmin;width:100%;resize:none;background:#0a0f19;border:1px solid var(--line);border-radius:1.4vmin;color:#cfe0ff;font:1.9vmin/1.45 ui-monospace,"SF Mono",Menlo,monospace;padding:1.4vmin;-webkit-user-select:text;user-select:text;outline:0}
+
+/* ---- portrait fallback ---- */
+@media (orientation:portrait){
+  .page,.page.todopage,.page.quizpage{grid-template-columns:1fr;grid-template-rows:none;overflow-y:auto;align-content:start}
+  .zq{min-height:90vmin}.zbody{overflow:visible;zoom:1!important}.zc{min-height:70vmin}
+  .hours{flex:none}.cell{padding:2vmin .2vmin}
+  .quiz{flex:none;min-height:80vmin}
+  .qbody{overflow:visible;zoom:1!important}
+}
+</style>
+</head>
+<body>
+<div class="pager" id="pager">
+<section class="page" id="pg-home">
+<div class="col" id="left">
+  <div>
+    <div class="time" id="time">--:--</div>
+    <div class="date" id="date"></div>
+  </div>
+  <div class="card">
+    <div class="now">
+      <div class="icon" id="icon"></div>
+      <div class="temp" id="temp">--°</div>
+      <div class="nowtxt"><div class="desc" id="desc"></div><div class="meta" id="meta"></div></div>
+    </div>
+    <div class="sun"><span><i data-ic="sunrise"></i><b id="sunrise">--:--</b></span><span><i data-ic="sunset"></i><b id="sunset">--:--</b></span><span class="uv"><i class="uvk">UV</i><b id="uv">–</b><em id="uvl"></em></span></div>
+  </div>
+  <div class="hours" id="hours"></div>
+  <div id="foot"></div>
+</div>
+
+<div class="col" id="right">
+  <div class="card trams">
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <div id="deps"></div>
+  </div>
+  <div class="card quiz">
+    <div class="qhead">
+      <div class="qtitle">Deutsch B1</div>
+      <div class="pills" id="pills"></div>
+      <div class="score" id="score"></div>
+    </div>
+    <div class="qbody" id="qbody">
+      <div class="qtag" id="qtag"></div>
+      <div class="qprompt" id="qprompt">…</div>
+      <div class="qhint" id="qhint"></div>
+      <div class="opts" id="opts"></div>
+      <div class="res" id="res"></div>
+    </div>
+    <div class="qfoot"><button class="next" id="next">Next</button></div>
+  </div>
+</div>
+</section>
+
+<section class="page todopage" id="pg-todo">
+  <div class="todocol">
+    <div class="card todos" data-kind="todo">
+      <div class="thead"><div class="ttitle"><i data-ic="list"></i>To-do</div><div class="tcount"></div><button class="refresh idle"><i data-ic="refresh"></i>Refresh</button></div>
+      <div class="tlist"></div>
+    </div>
+    <div class="card todos" data-kind="reminder">
+      <div class="thead"><div class="ttitle"><i data-ic="bell"></i>Reminders</div><div class="tcount"></div><button class="refresh idle"><i data-ic="refresh"></i>Refresh</button></div>
+      <div class="tlist"></div>
+    </div>
+  </div>
+  <div class="card pad">
+    <div class="paper">
+      <div class="padtitle">New note</div>
+      <textarea id="note" placeholder="Add a note!" enterkeyhint="done" autocapitalize="sentences" spellcheck="false"></textarea>
+      <div class="padfoot"><span class="padtip" id="padtip">Write with the Pencil or type</span><button class="addbtn" id="addnote" disabled>Add</button></div>
+    </div>
+    <div class="ctl">
+      <div class="grp"><label>Add to</label><div class="seg" id="g-kind"></div></div>
+      <div class="grp"><label>For</label><div class="seg" id="g-who"></div></div>
+      <div class="grp"><label>Priority</label><div class="seg" id="g-pri"></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="page planpage" id="pg-plan">
+  <div class="phead">
+    <div class="ptitle" id="pl-wk">Week</div><div class="prange" id="pl-range"></div>
+    <div class="pnav"><button id="pl-prev" aria-label="Previous week"><i data-ic="prev"></i></button><button id="pl-today">This week</button><button id="pl-next" aria-label="Next week"><i data-ic="next"></i></button></div>
+    <div class="legend" id="pl-legend"></div>
+  </div>
+  <div class="week" id="pl-week"></div>
+</section>
+<section class="page quizpage" id="pg-quiz">
+  <div class="card zq" id="zq">
+    <div class="zhead">
+      <div class="pills" id="z-cat"></div>
+      <div class="pills" id="z-lvl"></div>
+      <div class="pills" id="z-mode"></div>
+      <button class="zdrill" id="z-drill" hidden></button>
+      <span class="zsp"></span>
+      <span class="score" id="z-score"></span>
+    </div>
+    <div class="zbody" id="zbody"></div>
+    <div class="zpop" id="z-pop" hidden></div>
+    <div class="zfoot">
+      <div class="zrate">
+        <button id="z-up" aria-label="Good question" aria-pressed="false"><i data-ic="up"></i></button>
+        <button id="z-down" aria-label="Bad question" aria-pressed="false"><i data-ic="down"></i></button>
+        <button id="z-flag" aria-label="Flag a problem" aria-pressed="false"><i data-ic="flag"></i></button>
+      </div>
+      <span class="sp"></span>
+      <button class="ghost" id="z-skip">Skip</button>
+      <button class="next" id="z-next">Next</button>
+    </div>
+  </div>
+  <div class="card zc">
+    <h3 id="z-ch">Weakest concepts</h3>
+    <div class="zstat" id="z-stat"></div>
+    <div class="zlist" id="z-list"></div>
+    <button class="zcb" id="z-fb"><i data-ic="flag"></i>Feedback<i id="z-fbn" hidden></i></button>
+  </div>
+</section>
+</div>
+<div class="scrim" id="zf-scrim" hidden>
+  <div class="sheet card" role="dialog" aria-modal="true">
+    <div class="stitle">Quiz feedback<small id="zf-sub"></small></div>
+    <textarea id="zf-text" readonly></textarea>
+    <div class="sfoot"><button class="danger" id="zf-reset">Reset progress</button><span class="sp"></span><button class="ghost" id="zf-close">Close</button><button class="next show" id="zf-copy">Copy</button></div>
+  </div>
+</div>
+<div class="scrim" id="pl-scrim" hidden>
+  <div class="sheet card" role="dialog" aria-modal="true">
+    <div class="stitle" id="pl-title">New entry</div>
+    <textarea id="pl-text" placeholder="What's planned?" enterkeyhint="done" autocapitalize="sentences" spellcheck="false"></textarea>
+    <div class="grp"><label>Day</label><div class="seg" id="pl-day"></div></div>
+    <div class="grp"><label>Time</label><div class="tmrow"><input type="time" id="pl-time"><button class="ghost" id="pl-clear">No time</button></div></div>
+    <div class="grp"><label>For</label><div class="seg" id="pl-who"></div></div>
+    <div class="sfoot"><button class="danger" id="pl-del" hidden>Delete</button><span class="sp"></span><button class="ghost" id="pl-cancel" style="height:6.4vmin;font-size:2.3vmin">Cancel</button><button class="addbtn" id="pl-save" disabled>Save</button></div>
+  </div>
+</div>
+<div class="dots" id="dots"></div>
+
+<script>
+// ---------------- Settings: edit these ----------------
+const CONFIG = {
+  city: "Zurich", units: "celsius", hours: 6, refreshMinutes: 15,
+  model: "meteoswiss_icon_seamless"          // "" = Open-Meteo default blend
+};
+const STOPS = [
+  {key: "hirsch",    label: "Hirschwiesenstrasse", station: "Zürich, Hirschwiesenstrasse"},
+  {key: "milchbuck", label: "Milchbuck",           station: "Zürich, Milchbuck", hide: ["10","51","69"], hideTo: {"7": "Stettbach", "9": "Hirzenbach"}, minMin: 6}
+];
+const TRAM_ROWS = 4;       // departures shown
+const TRAM_FETCH = 60;     // departures downloaded per fetch
+// Line badge colours: number -> [background, text, border]. Anything else (buses) is yellow.
+const LINE_COLORS = {
+  "10": ["#e6007e", "#ffffff", "#e6007e"],   // pink
+  "51": ["#000000", "#ffffff", "#5b6577"],   // black
+  "7":  ["#000000", "#ffffff", "#5b6577"],   // black
+  "9":  ["#7b2cbf", "#ffffff", "#7b2cbf"]    // purple
+};
+const LINE_DEFAULT = ["#ffd400", "#1a1400", "#ffd400"];   // yellow
+// -------------------------------------------------------
+
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, "0");
+const shuffle = a => { for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const status = {};
+function setStatus(k, v){ status[k] = v; $("foot").textContent = Object.values(status).filter(Boolean).join(" · ") ; renderFoot(); }
+function renderFoot(){
+  const msgs = Object.values(status).filter(Boolean);
+  $("foot").textContent = (msgs.length ? msgs.join(" · ") + " — " : "") + "Weather: MeteoSwiss via Open-Meteo · Timetable: transport.opendata.ch";
+}
+renderFoot();
+
+/* ---------- Clock ---------- */
+function tickClock(){
+  const d = new Date();
+  $("time").textContent = pad(d.getHours()) + ":" + pad(d.getMinutes());
+  $("date").textContent = d.toLocaleDateString("en-GB", {weekday: "long", day: "numeric", month: "long"});
+}
+tickClock(); setInterval(tickClock, 1000);
+
+
+/* ---------- Icons (own line-style set, 24x24) ---------- */
+const IC = (()=>{
+  const C="#a9b7cc", A="#f2b45a", B="#6cb4ff", M="#cdd6ff", S="#d6ecff";
+  const cloud = (t) => '<g transform="'+t+'"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" fill="rgba(169,183,204,.16)" stroke="'+C+'"/></g>';
+  const sun = (x,y,r,ray) => { let o='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="rgba(242,180,90,.25)" stroke="'+A+'"/>';
+    for(let i=0;i<8;i++){ const a=i*Math.PI/4, c=Math.cos(a), s=Math.sin(a); o+='<path d="M'+(x+c*(r+ray*.45)).toFixed(2)+' '+(y+s*(r+ray*.45)).toFixed(2)+'L'+(x+c*(r+ray)).toFixed(2)+' '+(y+s*(r+ray)).toFixed(2)+'" stroke="'+A+'"/>'; } return o; };
+  const moon = (t) => '<g transform="'+t+'"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="rgba(205,214,255,.2)" stroke="'+M+'"/></g>';
+  const small = "translate(1.5 -2.5) scale(.82)";
+  const rain = '<path d="M8 16.5l-1 3M12 16.5l-1 3M16 16.5l-1 3" stroke="'+B+'"/>';
+  const k = {
+    clear:   d => d ? sun(12,12,4.2,3.2) : moon("translate(2 2) scale(.83)"),
+    mostly:  d => (d ? sun(9.5,9.5,3.6,2.8) : moon("translate(1 1) scale(.6)")) + cloud("translate(11 11) scale(.5)"),
+    partly:  d => (d ? sun(8.5,8,3,2.4) : moon("translate(1 .5) scale(.5)")) + cloud("translate(5 4.5) scale(.66)"),
+    cloud:   d => cloud("translate(0 0)"),
+    fog:     d => cloud(small) + '<path d="M5 17.5h14M8 20.5h8" stroke="'+C+'"/>',
+    drizzle: d => cloud(small) + '<path d="M8 17v2M12 17.5v2M16 17v2" stroke="'+B+'"/>',
+    rain:    d => cloud(small) + rain,
+    snow:    d => cloud(small) + '<g fill="'+S+'" stroke="none"><circle cx="8" cy="18" r="1.1"/><circle cx="12" cy="20.4" r="1.1"/><circle cx="16" cy="18" r="1.1"/></g>',
+    thunder: d => cloud(small) + '<path d="M13 14l-4 5.5h3.5L11 23l5-6.5h-3.5L14 14z" fill="'+A+'" stroke="'+A+'" stroke-width="1"/>',
+    sunrise: d => '<path d="M17 18a5 5 0 0 0-10 0M12 9V4M4.2 11.2l1.4 1.4M1.5 18h2M20.5 18h2M18.4 12.6l1.4-1.4" stroke="'+A+'"/><path d="M8.5 6.5L12 3l3.5 3.5" stroke="'+A+'"/><path d="M2 22h20" stroke="#6b7a94"/>',
+    sunset:  d => '<path d="M17 18a5 5 0 0 0-10 0M12 3v5M4.2 11.2l1.4 1.4M1.5 18h2M20.5 18h2M18.4 12.6l1.4-1.4" stroke="#f08a5d"/><path d="M8.5 5.5L12 9l3.5-3.5" stroke="#f08a5d"/><path d="M2 22h20" stroke="#6b7a94"/>',
+    refresh: d => '<path d="M20 11a8 8 0 0 0-14.5-3.5L4 9M4 4v5h5M4 13a8 8 0 0 0 14.5 3.5L20 15M20 20v-5h-5"/>',
+    list:    d => '<path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/>',
+    bell:    d => '<path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9zM10 20a2 2 0 0 0 4 0"/>',
+    prev:    d => '<path d="M15 5l-7 7 7 7"/>',
+    next:    d => '<path d="M9 5l7 7-7 7"/>',
+    check:   d => '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+    up:      d => '<path d="M7 11v9H4v-9zM7 11l4-8a2 2 0 0 1 2 2l-1 4h6.5a2 2 0 0 1 2 2.3l-1.2 6.5a2 2 0 0 1-2 1.7H7"/>',
+    down:    d => '<g transform="rotate(180 12 12)"><path d="M7 11v9H4v-9zM7 11l4-8a2 2 0 0 1 2 2l-1 4h6.5a2 2 0 0 1 2 2.3l-1.2 6.5a2 2 0 0 1-2 1.7H7"/></g>',
+    flag:    d => '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+    close:   d => '<path d="M6 6l12 12M18 6L6 18"/>'
+  };
+  return (name, day) => '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">' + (k[name] || k.cloud)(day !== false) + '</svg>';
+})();
+const paintIcons = root => (root || document).querySelectorAll("[data-ic]").forEach(e => { e.innerHTML = IC(e.dataset.ic); });
+paintIcons();
+let sunMin = {r: 7 * 60, s: 19 * 60};
+const isDay = t => { const m = +t.slice(11,13) * 60 + +t.slice(14,16); return m >= sunMin.r && m < sunMin.s; };
+
+/* ---------- Weather ---------- */
+function wmo(c){
+  if(c===0) return ["clear","Clear"]; if(c===1) return ["mostly","Mostly clear"];
+  if(c===2) return ["partly","Partly cloudy"]; if(c===3) return ["cloud","Overcast"];
+  if(c===45||c===48) return ["fog","Fog"]; if(c>=51&&c<=57) return ["drizzle","Drizzle"];
+  if(c>=61&&c<=67) return ["rain","Rain"]; if(c>=71&&c<=77) return ["snow","Snow"];
+  if(c>=80&&c<=82) return ["rain","Showers"]; if(c===85||c===86) return ["snow","Snow showers"];
+  if(c>=95) return ["thunder","Thunderstorm"]; return ["cloud",""];
+}
+const unit = CONFIG.units === "fahrenheit" ? "fahrenheit" : "celsius";
+const deg = v => (v == null ? "–" : Math.round(v) + "°");
+let place = null;
+async function locate(){
+  if(place) return place;
+  const g = await (await fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&name=" + encodeURIComponent(CONFIG.city))).json();
+  if(!g.results || !g.results.length) throw new Error("city");
+  return (place = g.results[0]);
+}
+async function loadWeather(){
+  try{
+    const p = await locate();
+    const url = "https://api.open-meteo.com/v1/forecast?latitude=" + p.latitude + "&longitude=" + p.longitude +
+      "&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m" +
+      "&hourly=temperature_2m,weather_code,precipitation&temperature_unit=" + unit +
+      "&wind_speed_unit=" + (unit === "fahrenheit" ? "mph" : "kmh") + "&timezone=auto&forecast_days=2" +
+      (CONFIG.model ? "&models=" + CONFIG.model : "");
+    const res = await fetch(url); if(!res.ok) throw new Error(res.status);
+    lastW = await res.json(); renderWeather(lastW); setStatus("weather", "");
+  }catch(e){ setStatus("weather", "Weather offline"); }
+}
+let lastW = null;
+function renderWeather(w){
+  const c = w.current, h = w.hourly, [ico, txt] = wmo(c.weather_code);
+  $("icon").innerHTML = IC(ico, isDay(c.time)); $("temp").textContent = deg(c.temperature_2m); $("desc").textContent = txt;
+  $("meta").textContent = (c.apparent_temperature != null ? "Feels like " + deg(c.apparent_temperature) + " · " : "") +
+    (c.wind_speed_10m != null ? "Wind " + Math.round(c.wind_speed_10m) + (unit === "fahrenheit" ? " mph" : " km/h") : "");
+  const now = c.time.slice(0,13) + ":00";
+  let s = h.time.findIndex(t => t > now); if(s < 0) s = 0;
+  const mm = unit === "fahrenheit" ? "in" : "mm";
+  $("hours").innerHTML = h.time.slice(s, s + CONFIG.hours).map((t, k) => {
+    const i = s + k, r = h.precipitation[i];
+    return '<div class="cell"><div class="l">' + t.slice(11,16) + '</div><div class="i">' + IC(wmo(h.weather_code[i])[0], isDay(t)) +
+      '</div><div class="t">' + deg(h.temperature_2m[i]) + '</div><div class="p">' + (r == null ? "" : r.toFixed(1) + " " + mm) + '</div></div>';
+  }).join("");
+}
+// Sunrise and sunset come from a separate plain request so they do not depend on the weather model above.
+async function loadSun(){
+  try{
+    const p = await locate();
+    const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=" + p.latitude + "&longitude=" + p.longitude +
+      "&current=uv_index&daily=sunrise,sunset&timezone=auto&forecast_days=1");
+    if(!res.ok) throw new Error(res.status);
+    const j = await res.json(), d = j.daily;
+    const uv = j.current && j.current.uv_index;
+    if(uv != null){ const L = uv < 3 ? ["Low", "#41c98f"] : uv < 6 ? ["Moderate", "#f2d14b"] : uv < 8 ? ["High", "#f2994a"] : uv < 11 ? ["Very high", "#ff6b6b"] : ["Extreme", "#b074ff"];
+      $("uv").textContent = (Math.round(uv * 10) / 10).toString(); $("uvl").textContent = L[0]; $("uvl").style.setProperty("--c", L[1]); }
+    $("sunrise").textContent = d.sunrise[0].slice(11,16);
+    $("sunset").textContent = d.sunset[0].slice(11,16);
+    const mn = x => +x.slice(11,13) * 60 + +x.slice(14,16);
+    sunMin = {r: mn(d.sunrise[0]), s: mn(d.sunset[0])}; if(lastW) renderWeather(lastW);
+  }catch(e){ /* keep the dashes */ }
+}
+loadWeather(); loadSun();
+setInterval(loadWeather, CONFIG.refreshMinutes * 60000);
+setInterval(loadSun, 30 * 60000);
+
+/* ---------- Trams: download the timetable rarely, work out "next departure" from the clock ---------- */
+const board = {}; STOPS.forEach(s => board[s.key] = {deps: [], lastTry: 0, lastOk: 0});
+let activeStop = STOPS[0].key;
+function lineStyle(n){
+  const c = LINE_COLORS[n] || LINE_DEFAULT;
+  return "background:" + c[0] + ";color:" + c[1] + ";box-shadow:inset 0 0 0 .3vmin " + c[2];
+}
+async function loadStop(s){
+  const b = board[s.key]; b.lastTry = Date.now();
+  try{
+    const url = "https://transport.opendata.ch/v1/stationboard?station=" + encodeURIComponent(s.station) + "&limit=" + TRAM_FETCH;
+    const res = await fetch(url); if(!res.ok) throw new Error(res.status);
+    const j = await res.json();
+    b.deps = (j.stationboard || []).filter(x => x.stop && x.stop.departureTimestamp).map(x => ({
+      t: x.stop.departureTimestamp * 1000, line: String(x.number || x.name || "?"), to: (x.to || "").replace(/^Zürich, /, "")
+    })).sort((p, q) => p.t - q.t);
+    b.lastOk = Date.now(); setStatus("tram-" + s.key, "");
+  }catch(e){ setStatus("tram-" + s.key, s.label + " timetable offline"); }
+  drawTrams();
+}
+function drawTabs(){
+  $("tabs").innerHTML = "";
+  STOPS.forEach(s => {
+    const b = document.createElement("button");
+    b.className = "tab"; b.textContent = s.label; b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", s.key === activeStop ? "true" : "false");
+    b.onclick = () => { activeStop = s.key; drawTabs(); drawTrams(); };
+    $("tabs").appendChild(b);
+  });
+}
+function drawTrams(){
+  const now = Date.now(), st = STOPS.find(x => x.key === activeStop);
+  const next = board[activeStop].deps.filter(d => d.t > now - 30000 && !(st.hide || []).includes(String(d.line)) && !(st.hideTo && st.hideTo[String(d.line)] && String(d.to).toLowerCase().includes(st.hideTo[String(d.line)].toLowerCase())) && (!st.minMin || Math.ceil((d.t - now) / 60000) >= st.minMin)).slice(0, TRAM_ROWS);
+  const box = $("deps"); box.innerHTML = "";
+  if(!next.length){ const e = document.createElement("div"); e.className = "empty"; e.textContent = "No departures loaded yet"; box.appendChild(e); return; }
+  next.forEach(d => {
+    const m = Math.ceil((d.t - now) / 60000), at = new Date(d.t), row = document.createElement("div");
+    row.className = "dep";
+    const ln = document.createElement("span"); ln.className = "line"; ln.setAttribute("style", lineStyle(d.line)); ln.textContent = d.line;
+    const to = document.createElement("span"); to.className = "to"; to.textContent = d.to;
+    const t = document.createElement("span"); t.className = "at"; t.textContent = pad(at.getHours()) + ":" + pad(at.getMinutes());
+    const mn = document.createElement("span"); mn.className = "min"; mn.textContent = m <= 0 ? "now" : m + " min";
+    row.append(ln, to, t, mn); box.appendChild(row);
+  });
+}
+function maybeRefetch(){
+  STOPS.forEach(s => {
+    const b = board[s.key], left = b.deps.filter(d => d.t > Date.now()).length;
+    if((left < 8 || Date.now() - b.lastOk > 3 * 3600000) && Date.now() - b.lastTry > 5 * 60000) loadStop(s);
+  });
+}
+drawTabs(); drawTrams(); STOPS.forEach(loadStop);
+setInterval(drawTrams, 10000); setInterval(maybeRefetch, 60000);
+
+/* ---------- German quiz (exam style: one question at a time, a/b/c, specific explanation) ---------- */
+const Q = {words: [], verbs: [], gram: [], plur: [], nouns: [], tails: new Map(), mode: "all", asked: 0, score: 0, right: 0, cur: null, answered: false, retry: [], recent: []};
+const GENDER = {der: "masculine", die: "feminine", das: "neuter"};
+const PLURAL_ONLY = new Set(["die Eltern","die Geschwister","die Ferien","die Nudeln","die Schuhe","die Verwandten","die Nachrichten","die Schulden","die Kosten","die Möbel","die Großeltern","die Unterlagen","die Überstunden","die Ausgaben","die Einnahmen","die Kenntnisse","die Beweise","die Medien","die Nebenkosten"]);
+const NATURAL = new Set(["der Mann","die Frau","der Vater","die Mutter","der Sohn","die Tochter","der Bruder","die Schwester","der Onkel","die Tante","der Großvater","die Großmutter","der Ehemann","die Ehefrau","der Freund","die Freundin","der Kollege","die Kollegin","der Chef","die Chefin","der Arzt","die Ärztin","der Lehrer","die Lehrerin","der Student","die Studentin","der Cousin","die Cousine","der Kunde","die Kundin"]);
+const CALENDAR = new Set(["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag","Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember","Frühling","Sommer","Herbst","Winter"]);
+const RULES = [ // [suffix, article, always?, extra condition]
+  ["ung","die",1],["heit","die",1],["keit","die",1],["schaft","die",1],["tion","die",1],["sion","die",1],["ität","die",1],
+  ["ling","der",1],["ismus","der",1],["chen","das",1],["lein","das",1],["eur","der",1],
+  ["ment","das",0],["nis","das",0],["ist","der",0],["ent","der",0],["or","der",0],["um","das",0],["ma","das",0],
+  ["ik","die",0],["ur","die",0],["ie","die",0],["ei","die",0],["in","die",1,n => /female/.test(n.en)],["e","die",0]
+].sort((a, b) => b[0].length - a[0].length);
+
+function articleWhy(n){
+  const b = n.bare.toLowerCase();
+  if(NATURAL.has(n.de)) return "People take the article that matches their sex (natural gender), so it is " + n.de + ".";
+  if(CALENDAR.has(n.bare)) return "Days of the week, months and seasons are always masculine, so it is " + n.de + ".";
+  for(let k = 3; k <= n.bare.length - 3; k++){
+    const tail = b.slice(k);
+    if(tail.length < 4 && tail !== "tag") continue;
+    const t = Q.tails.get(tail);
+    if(t && t !== n && t.art === n.art) return "Compound noun: the last part decides the article (" + t.de + " → " + n.de + ").";
+  }
+  for(const [s, a, always, cond] of RULES){
+    if(b.endsWith(s) && b.length > s.length + 1 && (!cond || cond(n))){
+      const g = GENDER[a];
+      if(a === n.art) return "Nouns ending in -" + s + (cond ? " that name a woman" : "") + " are " + (always ? "always " : "mostly ") + g + ", so it is " + n.de + ".";
+      return "Nouns ending in -" + s + " are mostly " + g + ", but " + n.de + " is an exception. Learn it together with its article.";
+    }
+  }
+  return "There is no reliable pattern for this word, so learn it together with its article: " + n.de + ".";
+}
+
+function kindOf(w){ return /^(der|die|das) /.test(w.de) ? "n" : /^to /.test(w.en) ? "v" : "o"; }
+function farFrom(list, idx, min){ const far = list.filter(x => Math.abs(x.i - idx) >= min); return far.length >= 12 ? far : list; }
+const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/* A question is {id, tag, prompt, hint, opts[], ans, why}; prompt contains ___ for the gap. */
+function make(id, tag, prompt, hint, correct, wrongs, why, keepOrder){
+  const o = [correct, ...wrongs];
+  if(!keepOrder) shuffle(o);
+  return {id, tag, prompt, hint, opts: o, ans: o.indexOf(correct), why};
+}
+
+function genVerb(){
+  const v = pick(Q.verbs), type = pick(["pres", "pp", "pp", "aux"]), a = v.ax === "s" ? "ist" : "hat";
+  const hint = "(" + v.i + " – " + v.e + ")";
+  if(type === "pres")
+    return make("v:" + v.i + ":p", "Verb · Präsens (er/sie/es)", v.ps, hint, v.er, [v.be, v.i],
+      v.np + " The form “" + v.i + "” belongs to wir/sie/Sie, not to er/sie/es.");
+  if(type === "pp")
+    return make("v:" + v.i + ":pp", "Verb · Perfekt (Partizip II)", v.fs.replace("{A}", a).replace("{P}", "___"), hint, v.pp, v.b, v.npp);
+  const why = v.aw || (v.k === "m" ? v.i + " describes movement from one place to another, so the Perfekt is formed with sein."
+    : v.k === "z" ? v.i + " describes a change of state, so the Perfekt is formed with sein."
+    : v.i + " is an activity or takes an object (no change of place or state), so the Perfekt is formed with haben.");
+  return make("v:" + v.i + ":a", "Verb · Perfekt (haben oder sein)", v.fs.replace("{A}", "___").replace("{P}", v.pp), hint, a, a === "ist" ? ["hat", "wird"] : ["ist", "wird"], why);
+}
+function genGrammar(){
+  const g = pick(Q.gram);
+  return make("g:" + g.s, "Grammar · " + g.c, g.s, "", g.o[0], [g.o[1], g.o[2]], g.w);
+}
+function genNoun(){
+  if(Q.plur.length && (!Q.nouns.length || Math.random() < .4)){
+    const p = pick(Q.plur);
+    return make("p:" + p.n, "Noun · Plural", p.n + "  →  die ___", "", p.p, p.b, p.w);
+  }
+  const n = pick(Q.nouns);
+  return make("a:" + n.de, "Noun · Article", "___ " + n.bare, "(" + n.en + ")", n.art, ["der", "die", "das"].filter(x => x !== n.art), articleWhy(n), true);
+}
+function genVocab(){
+  if(Q.nouns.length && Math.random() < .55){
+    for(let tries = 0; tries < 25; tries++){
+      const n = pick(Q.nouns), re = new RegExp("(^|[^\\p{L}])" + esc(n.bare) + "(?![\\p{L}])", "u");
+      if(!re.test(n.ex) || n.ex.split(/\s+/).length < 6) continue;
+      const sentence = n.ex.replace(re, (m, pre) => pre + "___");
+      const pool = farFrom(Q.nouns.filter(x => x.art === n.art && x.bare !== n.bare && x.en !== n.en && !n.ex.includes(x.bare)), n.i, 200);
+      const wr = shuffle(pool.slice()).slice(0, 2);
+      if(wr.length < 2) continue;
+      return make("w:g:" + n.de, "Vocabulary · Fill the gap", sentence, "(" + n.en + ")", n.bare, wr.map(x => x.bare),
+        "“" + n.bare + "” (" + n.en + ") fits the sentence. The other options mean: " + wr.map(x => x.bare + " = " + x.en).join("; ") + ". Learn it as " + n.de + ".");
+    }
+  }
+  const w = pick(Q.words), k = kindOf(w);
+  const pool = farFrom(Q.words.filter(x => kindOf(x) === k && x.en !== w.en && x.de !== w.de), w.i, 150);
+  const seen = new Set([w.en]), wr = [];
+  for(const x of shuffle(pool.slice())){ if(!seen.has(x.en)){ seen.add(x.en); wr.push(x); if(wr.length === 2) break; } }
+  const why = w.de + " = " + w.en + ". Example: " + w.ex;
+  if(Math.random() < .5) return make("w:m:" + w.de, "Vocabulary · Meaning", "Was bedeutet »" + w.de + "«?", "", w.en, wr.map(x => x.en), why);
+  return make("w:r:" + w.de, "Vocabulary · Which word?", "Welches Wort bedeutet »" + w.en + "«?", "", w.de, wr.map(x => x.de), why);
+}
+
+const GENS = {
+  all:     () => { const r = Math.random() * 8.8; return r < 3 ? "verb" : r < 6 ? "grammar" : r < 7.6 ? "noun" : "vocab"; },
+  verbs:   () => "verb", grammar: () => "grammar", nouns: () => "noun", vocab: () => "vocab"
+};
+const HAVE = {verb: () => Q.verbs.length, grammar: () => Q.gram.length, noun: () => Q.nouns.length || Q.plur.length, vocab: () => Q.words.length >= 20};
+const GEN = {verb: genVerb, grammar: genGrammar, noun: genNoun, vocab: genVocab};
+
+function nextQuestion(){
+  let q = null;
+  const due = Q.retry.findIndex(r => r.due <= Q.asked);
+  if(due >= 0){ q = Q.retry.splice(due, 1)[0].q; q = Object.assign({}, q, {tag: "Retry · " + q.tag.replace(/^Retry · /, "")}); }
+  else{
+    for(let tries = 0; tries < 12 && !q; tries++){
+      let kind = GENS[Q.mode](); if(!HAVE[kind]()) continue;
+      const c = GEN[kind]();
+      if(c.opts.length === 3 && new Set(c.opts).size === 3 && !Q.recent.includes(c.id)) q = c;
+    }
+    if(!q) q = (HAVE.grammar() ? genGrammar() : null);
+  }
+  if(!q){ $("qprompt").textContent = "No questions loaded. Check that words.json, verbs.json, grammar.json and plurals.json are in the repo."; return; }
+  Q.recent.push(q.id); if(Q.recent.length > 30) Q.recent.shift();
+  Q.cur = q; Q.answered = false; renderQuestion();
+}
+function renderQuestion(){
+  const q = Q.cur;
+  $("qtag").textContent = q.tag + " — choose a, b or c";
+  const box = $("qprompt"); box.innerHTML = "";
+  q.prompt.split("___").forEach((part, i, arr) => {
+    box.appendChild(document.createTextNode(part));
+    if(i < arr.length - 1){ const g = document.createElement("span"); g.className = "gap"; g.id = "gap"; g.textContent = " "; box.appendChild(g); }
+  });
+  $("qhint").textContent = q.hint;
+  const o = $("opts"); o.innerHTML = "";
+  q.opts.forEach((t, i) => {
+    const b = document.createElement("button"); b.className = "opt"; b.dataset.i = i;
+    const l = document.createElement("span"); l.className = "l"; l.textContent = "abc"[i];
+    const s = document.createElement("span"); s.textContent = t;
+    b.append(l, s); o.appendChild(b);
+  });
+  const r = $("res"); r.innerHTML = "<b>Not quite. The answer is a) " + q.opts[q.ans] + "</b><span>" + q.why + "</span>"; r.className = "res show measure";
+  fitQuiz();
+  r.className = "res"; r.innerHTML = ""; $("next").className = "next";
+}
+$("opts").addEventListener("click", e => {
+  const b = e.target.closest(".opt"); if(!b || Q.answered || !Q.cur) return;
+  Q.answered = true; Q.asked++;
+  const q = Q.cur, pickI = +b.dataset.i, good = pickI === q.ans;
+  if(good){ Q.right++; } else { Q.retry.push({q, due: Q.asked + 4}); }
+  [...$("opts").children].forEach((x, i) => x.classList.add(i === q.ans ? "ok" : i === pickI ? "bad" : "dim"));
+  const gap = $("gap"); if(gap){ gap.textContent = q.opts[q.ans]; gap.classList.add("ok"); }
+  const res = $("res"); res.innerHTML = "";
+  const v = document.createElement("b"); v.textContent = good ? "Richtig." : "Not quite. The answer is " + "abc"[q.ans] + ") " + q.opts[q.ans];
+  const w = document.createElement("span"); w.textContent = q.why;
+  res.append(v, w); res.className = "res show " + (good ? "right" : "wrong");
+  $("next").className = "next show";
+  $("score").textContent = Q.right + " / " + Q.asked + " correct";
+  fitQuiz();
+});
+function fitQuiz(){
+  const b = $("qbody"); if(!b) return;
+  let z = 1; b.style.zoom = 1;
+  while(b.scrollHeight > b.clientHeight + 1 && z > .55){ z -= .05; b.style.zoom = z; }
+  if(b.scrollHeight > b.clientHeight + 1) b.style.overflowY = "auto"; else b.style.overflowY = "hidden";
+}
+window.addEventListener("resize", fitQuiz);
+$("next").addEventListener("click", nextQuestion);
+
+const MODES = [["all", "All"], ["verbs", "Verbs"], ["grammar", "Grammar"], ["nouns", "Nouns"], ["vocab", "Words"]];
+function drawPills(){
+  const p = $("pills"); p.innerHTML = "";
+  MODES.forEach(([k, label]) => {
+    const b = document.createElement("button"); b.className = "pill"; b.textContent = label;
+    b.setAttribute("aria-pressed", Q.mode === k ? "true" : "false");
+    b.onclick = () => { Q.mode = k; Q.retry = []; drawPills(); nextQuestion(); };
+    p.appendChild(b);
+  });
+}
+async function getJSON(u){ const r = await fetch(u, {cache: "no-cache"}); if(!r.ok) throw new Error(u); return r.json(); }
+Promise.all(["words.json", "verbs.json", "grammar.json", "plurals.json"].map(u => getJSON(u).catch(() => []))).then(([w, v, g, p]) => {
+  Q.words = w.map((x, i) => Object.assign({i}, x)); Q.verbs = v; Q.gram = g; Q.plur = p;
+  Q.nouns = Q.words.map(x => { const m = /^(der|die|das) (.+)$/.exec(x.de); return m && !PLURAL_ONLY.has(x.de) ? {de: x.de, en: x.en, ex: x.ex, i: x.i, art: m[1], bare: m[2]} : null; }).filter(Boolean);
+  Q.nouns.forEach(n => { const k = n.bare.toLowerCase(); if(!Q.tails.has(k)) Q.tails.set(k, n); });
+  drawPills(); nextQuestion();
+  window.__dbg = {Q, articleWhy, GEN};
+});
+drawPills();
+
+/* ---------- Keep the screen on ---------- */
+async function keepAwake(){ try{ if("wakeLock" in navigator) await navigator.wakeLock.request("screen"); }catch(e){} }
+keepAwake(); document.addEventListener("visibilitychange", () => { if(!document.hidden) keepAwake(); });
+
+/* ---------- Pages: swipe between dashboard and to-do ---------- */
+const pager = $("pager");
+$("dots").innerHTML = [...pager.children].map((p, i) => '<button aria-label="Page ' + (i + 1) + '"' + (i ? "" : ' aria-current="true"') + '></button>').join("");
+const dotBtns = [...$("dots").children];
+function syncDots(){ const i = Math.round(pager.scrollLeft / Math.max(1, pager.clientWidth)); dotBtns.forEach((b, k) => b.setAttribute("aria-current", k === i ? "true" : "false")); }
+pager.addEventListener("scroll", syncDots, {passive: true});
+dotBtns.forEach((b, k) => b.addEventListener("click", () => pager.scrollTo({left: k * pager.clientWidth, behavior: "smooth"})));
+window.addEventListener("resize", () => { syncDots(); });
+
+/* ---------- To-do list, reminders + notepad (saved on this iPad) ---------- */
+const TKEY = "dash.todos.v1";
+const WHO = {mauricio: {n: "Mauricio", c: "#6cb4ff"}, susanna: {n: "Susanna", c: "#f08fc0"}, general: {n: "General", c: "#8fd6b8"}};
+const PRI = {high: {n: "High", c: "#ff6b6b", o: 0}, medium: {n: "Medium", c: "#f2b45a", o: 1}, low: {n: "Low", c: "#8da2c0", o: 2}};
+const KINDS = {todo: {n: "To-do", c: "#eef1f6"}, reminder: {n: "Reminder", c: "#eef1f6"}};
+let todos = [];
+try{ todos = JSON.parse(localStorage.getItem(TKEY) || "[]").filter(t => t && typeof t.text === "string")
+  .map(t => ({id: t.id, text: t.text, done: !!t.done, kind: KINDS[t.kind] ? t.kind : "todo", who: WHO[t.who] ? t.who : "general", pri: PRI[t.pri] ? t.pri : "medium"})); }catch(e){ todos = []; }
+const saveTodos = () => { try{ localStorage.setItem(TKEY, JSON.stringify(todos)); }catch(e){} };
+const cards = {}; document.querySelectorAll(".todos").forEach(c => cards[c.dataset.kind] = c);
+function renderTodos(scrollKind){
+  Object.keys(KINDS).forEach(kind => {
+    const card = cards[kind], box = card.querySelector(".tlist"), keep = box.scrollTop; box.innerHTML = "";
+    const items = todos.filter(t => t.kind === kind).sort((a, b) => PRI[a.pri].o - PRI[b.pri].o);   // stable: same priority keeps the order added
+    if(!items.length){ const e = document.createElement("div"); e.className = "tempty"; e.textContent = kind === "todo" ? "Nothing to do. Write a note and add it as a to-do." : "No reminders. Write a note and add it as a reminder."; box.appendChild(e); }
+    items.forEach(t => {
+      const r = document.createElement("button"), w = WHO[t.who], p = PRI[t.pri];
+      r.className = "todo" + (t.done ? " done" : ""); r.dataset.id = t.id; r.style.setProperty("--c", w.c);
+      r.setAttribute("role", "checkbox"); r.setAttribute("aria-checked", t.done ? "true" : "false");
+      const b = document.createElement("span"); b.className = "box"; b.innerHTML = IC("check");
+      const x = document.createElement("span"); x.className = "tx"; x.textContent = t.text;
+      const ch = document.createElement("span"); ch.className = "chips";
+      const c1 = document.createElement("span"); c1.className = "chip"; c1.style.setProperty("--c", w.c); c1.textContent = w.n;
+      const c2 = document.createElement("span"); c2.className = "chip p"; c2.style.setProperty("--c", p.c); c2.textContent = p.n;
+      ch.append(c2, c1); r.append(b, x, ch); box.appendChild(r);
+    });
+    const open = items.filter(t => !t.done).length, done = items.length - open;
+    card.querySelector(".tcount").textContent = items.length ? open + " open" + (done ? " · " + done + " done" : "") : "";
+    card.querySelector(".refresh").classList.toggle("idle", !done);
+    box.scrollTop = scrollKind === kind ? box.scrollHeight : keep;
+  });
+}
+document.querySelectorAll(".todos").forEach(card => {
+  card.querySelector(".tlist").addEventListener("click", e => {
+    const r = e.target.closest(".todo"); if(!r) return;
+    const t = todos.find(x => String(x.id) === r.dataset.id); if(!t) return;
+    t.done = !t.done; saveTodos(); renderTodos();
+  });
+  card.querySelector(".refresh").addEventListener("click", () => {
+    const rows = [...card.querySelectorAll(".todo.done")]; if(!rows.length) return;
+    rows.forEach(r => r.classList.add("gone"));
+    setTimeout(() => { todos = todos.filter(t => !(t.kind === card.dataset.kind && t.done)); saveTodos(); renderTodos(); }, 360);
+  });
+});
+paintIcons();
+
+/* composer */
+const sel = {kind: null, who: "general", pri: "medium"};
+function buildSeg(id, key, map){
+  const g = $(id); g.innerHTML = "";
+  Object.keys(map).forEach(v => {
+    const b = document.createElement("button"); b.dataset.v = v; b.style.setProperty("--c", map[v].c);
+    if(key === "who" || key === "pri"){ const d = document.createElement("i"); d.className = "dot"; b.appendChild(d); }
+    b.appendChild(document.createTextNode(map[v].n)); g.appendChild(b);
+  });
+  g.addEventListener("click", e => { const b = e.target.closest("button"); if(!b) return; sel[key] = b.dataset.v; syncComposer(); });
+}
+buildSeg("g-kind", "kind", KINDS); buildSeg("g-who", "who", WHO); buildSeg("g-pri", "pri", PRI);
+function syncComposer(){
+  [["g-kind", "kind"], ["g-who", "who"], ["g-pri", "pri"]].forEach(([id, k]) => [...$(id).children].forEach(b => b.setAttribute("aria-pressed", b.dataset.v === sel[k] ? "true" : "false")));
+  const has = !!$("note").value.trim(), ok = has && !!sel.kind;
+  $("addnote").disabled = !ok;
+  $("padtip").textContent = !has ? "Write with the Pencil or type" : !sel.kind ? "Now choose To-do or Reminder" : "Ready. Tap Add";
+}
+function addNote(){
+  const v = $("note").value.replace(/\s+/g, " ").trim(); if(!v) return;
+  if(!sel.kind){ const g = $("g-kind"); g.classList.remove("nudge"); void g.offsetWidth; g.classList.add("nudge"); return; }
+  const kind = sel.kind;
+  todos.push({id: Date.now() + Math.random().toString(36).slice(2, 6), text: v, done: false, kind, who: sel.who, pri: sel.pri});
+  saveTodos(); $("note").value = ""; sel.kind = null; sel.who = "general"; sel.pri = "medium";
+  syncComposer(); renderTodos(); const box = cards[kind].querySelector(".tlist"); const row = [...box.children].find(r => r.dataset.id === todos[todos.length - 1].id); if(row) row.scrollIntoView({block: "nearest"});
+}
+$("addnote").addEventListener("click", addNote);
+$("note").addEventListener("input", syncComposer);
+$("note").addEventListener("keydown", e => { if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); addNote(); } });
+syncComposer(); renderTodos();
+
+/* ---------- Week planner ---------- */
+const PLKEY = "dash.plan.v1";
+let plan = [];
+try{ plan = JSON.parse(localStorage.getItem(PLKEY) || "[]").filter(e => e && typeof e.text === "string" && /^\d{4}-\d\d-\d\d$/.test(e.date))
+  .map(e => ({id: e.id, date: e.date, text: e.text, time: /^\d\d:\d\d$/.test(e.time || "") ? e.time : "", who: WHO[e.who] ? e.who : "general", done: !!e.done})); }catch(e){ plan = []; }
+const savePlan = () => { try{ localStorage.setItem(PLKEY, JSON.stringify(plan)); }catch(e){} };
+const isoD = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+const fromIso = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+const mondayOf = d => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; };
+const addDays = (d, n) => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() + n); return x; };
+function isoWeek(d){ const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); const n = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - n); const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1)); return Math.ceil(((t - y0) / 86400000 + 1) / 7); }
+const DAYN = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+let weekOff = 0;
+const weekStart = () => addDays(mondayOf(new Date()), weekOff * 7);
+$("pl-legend").innerHTML = Object.values(WHO).map(w => '<span style="--c:' + w.c + '"><i></i>' + w.n + '</span>').join("");
+function renderPlan(){
+  const ws = weekStart(), we = addDays(ws, 6), today = isoD(new Date()), wrap = $("pl-week");
+  const keep = [...wrap.querySelectorAll(".dlist")].map(l => l.scrollTop);
+  $("pl-wk").textContent = "Week " + isoWeek(ws);
+  const m = d => d.toLocaleDateString("en-GB", {month: "short"});
+  $("pl-range").textContent = ws.getMonth() === we.getMonth() ? ws.getDate() + " – " + we.getDate() + " " + m(we) : ws.getDate() + " " + m(ws) + " – " + we.getDate() + " " + m(we);
+  $("pl-today").style.opacity = weekOff === 0 ? .45 : 1;
+  wrap.innerHTML = "";
+  for(let i = 0; i < 7; i++){
+    const d = addDays(ws, i), key = isoD(d), col = document.createElement("div");
+    col.className = "day" + (i > 4 ? " we" : "") + (key === today ? " today" : "") + (key < today ? " past" : "");
+    col.innerHTML = '<div class="dhead"><span class="dname">' + DAYN[i] + '</span><span class="dnum">' + d.getDate() + '</span></div><div class="dlist"></div>';
+    const list = col.querySelector(".dlist");
+    const items = plan.filter(e => e.date === key).map((e, k) => ({e, k}))
+      .sort((a, b) => (a.e.time && b.e.time ? (a.e.time < b.e.time ? -1 : a.e.time > b.e.time ? 1 : 0) : a.e.time ? -1 : b.e.time ? 1 : 0) || a.k - b.k);
+    items.forEach(({e}) => {
+      const b = document.createElement("div"); b.className = "ent" + (e.done ? " done" : ""); b.dataset.id = e.id; b.style.setProperty("--c", WHO[e.who].c);
+      b.innerHTML = '<span class="ck">' + IC("check") + '</span><span class="body">' + (e.time ? '<span class="tm"></span>' : "") + '<span class="tx"></span></span>';
+      if(e.time) b.querySelector(".tm").textContent = e.time;
+      b.querySelector(".tx").textContent = e.text;
+      list.appendChild(b);
+    });
+    const add = document.createElement("button"); add.className = "dadd"; add.dataset.date = key; add.textContent = "+"; add.setAttribute("aria-label", "Add to " + DAYN[i]);
+    col.appendChild(add); wrap.appendChild(col);
+    if(keep[i]) list.scrollTop = keep[i];
+  }
+}
+$("pl-prev").onclick = () => { weekOff--; renderPlan(); };
+$("pl-next").onclick = () => { weekOff++; renderPlan(); };
+$("pl-today").onclick = () => { weekOff = 0; renderPlan(); };
+$("pl-week").addEventListener("click", e => {
+  const add = e.target.closest(".dadd"); if(add){ openSheet(null, add.dataset.date); return; }
+  const ent = e.target.closest(".ent"); if(!ent) return;
+  const it = plan.find(x => String(x.id) === ent.dataset.id); if(!it) return;
+  if(e.target.closest(".ck")){ it.done = !it.done; savePlan(); renderPlan(); } else openSheet(it, it.date);
+});
+/* entry sheet (add / edit) */
+const sh = {id: null, date: "", time: "", who: "general", weekStart: null};
+function segs(el, items, key, onChange){
+  el.innerHTML = "";
+  items.forEach(([v, label, c]) => { const b = document.createElement("button"); b.dataset.v = v; if(c) b.style.setProperty("--c", c);
+    if(c){ const d = document.createElement("i"); d.className = "dot"; b.appendChild(d); } b.appendChild(document.createTextNode(label)); el.appendChild(b); });
+  el.onclick = e => { const b = e.target.closest("button"); if(!b) return; sh[key] = b.dataset.v; paintSheet(); };
+}
+function paintSheet(){
+  [["pl-day", "date"], ["pl-who", "who"]].forEach(([id, k]) => [...$(id).children].forEach(b => b.setAttribute("aria-pressed", b.dataset.v === sh[k] ? "true" : "false")));
+  $("pl-save").disabled = !$("pl-text").value.trim();
+}
+function openSheet(it, date){
+  sh.id = it ? it.id : null; sh.date = date; sh.who = it ? it.who : "general";
+  const ws = mondayOf(fromIso(date)); sh.weekStart = ws;
+  segs($("pl-day"), DAYN.map((n, i) => [isoD(addDays(ws, i)), n]), "date");
+  segs($("pl-who"), Object.keys(WHO).map(k => [k, WHO[k].n, WHO[k].c]), "who");
+  $("pl-text").value = it ? it.text : ""; $("pl-time").value = it ? it.time : "";
+  $("pl-title").innerHTML = (it ? "Edit entry" : "New entry");
+  $("pl-del").hidden = !it; paintSheet(); $("pl-scrim").hidden = false;
+  if(!it) setTimeout(() => $("pl-text").focus(), 50);
+}
+const closeSheet = () => { $("pl-scrim").hidden = true; $("pl-text").blur(); };
+$("pl-text").addEventListener("input", paintSheet);
+$("pl-text").addEventListener("keydown", e => { if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); if(!$("pl-save").disabled) $("pl-save").click(); } });
+$("pl-clear").onclick = () => { $("pl-time").value = ""; };
+$("pl-cancel").onclick = closeSheet;
+$("pl-scrim").addEventListener("click", e => { if(e.target === $("pl-scrim")) closeSheet(); });
+$("pl-save").onclick = () => {
+  const text = $("pl-text").value.replace(/\s+/g, " ").trim(); if(!text) return;
+  const time = /^\d\d:\d\d$/.test($("pl-time").value) ? $("pl-time").value : "";
+  if(sh.id){ const it = plan.find(x => x.id === sh.id); if(it){ it.text = text; it.time = time; it.date = sh.date; it.who = sh.who; } }
+  else plan.push({id: Date.now() + Math.random().toString(36).slice(2, 6), date: sh.date, text, time, who: sh.who, done: false});
+  savePlan(); closeSheet(); renderPlan();
+};
+$("pl-del").onclick = () => { plan = plan.filter(x => x.id !== sh.id); savePlan(); closeSheet(); renderPlan(); };
+paintIcons(); renderPlan();
+let lastDay = isoD(new Date());
+setInterval(() => { const n = isoD(new Date()); if(n !== lastDay){ lastDay = n; renderPlan(); } }, 30000);
+
+/* ---------- Engineering interview quiz (progress saved on this iPad) ---------- */
+const ZKEY = "dash.eq.v1", ZUI = "dash.eq.ui";
+const ZCAT = {bess: {n: "BESS and energy", c: "#f2b45a", full: "BESS, energy and engineering"}, ds: {n: "Data science", c: "#6cb4ff", full: "Data science"}, sw: {n: "Software", c: "#b79cff", full: "Software and databases"}};
+const ZINT = [20, 50, 120, 300, 700];
+const ZREASON = [["wrong", "The marked answer is wrong"], ["multi", "More than one answer fits"], ["unclear", "Unclear wording"], ["old", "Outdated"]];
+const zEl = id => document.getElementById(id);
+let Z = {tick: 0, q: {}}, zui = {cat: "all", lvl: "all", drill: "", mode: "mixed"}, zbank = [], zById = {}, zcur = null, zans = false, zsess = {n: 0, c: 0}, zver = 1;
+try{ const s = JSON.parse(localStorage.getItem(ZKEY) || "null"); if(s && s.q) Z = s; }catch(e){}
+try{ Object.assign(zui, JSON.parse(localStorage.getItem(ZUI) || "{}")); }catch(e){}
+const zSave = () => { try{ localStorage.setItem(ZKEY, JSON.stringify(Z)); }catch(e){} };
+const zSaveUi = () => { try{ localStorage.setItem(ZUI, JSON.stringify(zui)); }catch(e){} };
+const zRec = id => Z.q[id] || (Z.q[id] = {n: 0, c: 0, box: 0, due: 0, rate: 0, flags: []});
+const zShuf = a => { a = a.slice(); for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+function zStats(){
+  const m = {};
+  zbank.forEach(q => {
+    const o = m[q.s] || (m[q.s] = {s: q.s, c: q.c, tot: 0, n: 0, k: 0, seen: 0}), r = Z.q[q.id];
+    o.tot++; if(r && r.n){ o.n += r.n; o.k += r.c; o.seen++; }
+  });
+  Object.values(m).forEach(o => { o.acc = (o.k + 1) / (o.n + 2); });
+  return m;
+}
+const zPool = () => zbank.filter(q => (zui.drill ? q.s === zui.drill : (zui.cat === "all" || q.c === zui.cat)) && (zui.lvl === "all" || q.l === zui.lvl));
+function zWpick(arr, w){
+  let t = 0; const ws = arr.map(x => { const v = Math.max(.01, w(x)); t += v; return v; });
+  let r = Math.random() * t;
+  for(let i = 0; i < arr.length; i++){ r -= ws[i]; if(r <= 0) return arr[i]; }
+  return arr[arr.length - 1];
+}
+function zChoose(){
+  const pool = zPool(); if(!pool.length) return null;
+  const st = zStats(), mode = zui.mode || "mixed", R = q => Z.q[q.id], seen = q => R(q) && R(q).n > 0;
+  let base = pool;
+  if(mode === "new") base = pool.filter(q => !seen(q));
+  else if(mode === "missed") base = pool.filter(q => seen(q) && R(q).box === 0);
+  else if(mode === "liked") base = pool.filter(q => R(q) && R(q).rate === 1);
+  if(!base.length) return null;
+  const age = q => (R(q) && R(q).shown != null) ? (Z.shown || 0) - R(q).shown : 1e9;
+  const W = Math.min(40, Math.floor(base.length * .6));
+  let cand = base.filter(q => age(q) >= W);
+  if(!cand.length) cand = base.slice().sort((a, b) => age(b) - age(a)).slice(0, Math.max(1, Math.ceil(base.length / 2)));
+  const wk = q => 1.15 - st[q.s].acc;
+  if(mode === "mixed"){
+    const due = cand.filter(q => seen(q) && R(q).due <= Z.tick), fresh = cand.filter(q => !seen(q));
+    if(due.length && (Math.random() < .08 || !fresh.length)) return zWpick(due, q => (5 - R(q).box) + wk(q) * 3);
+    if(fresh.length) return zWpick(fresh, wk);
+    return zWpick(cand, q => Math.min(age(q), 200) / 50 + wk(q));
+  }
+  return zWpick(cand, q => Math.min(age(q), 200) / 50 + .5);
+}
+
+function zFit(){
+  const b = zEl("zbody"); if(!b) return;
+  let z = 1; b.style.zoom = 1;
+  while(b.scrollHeight > b.clientHeight + 1 && z > .5){ z -= .05; b.style.zoom = z; }
+  b.style.overflowY = b.scrollHeight > b.clientHeight + 1 ? "auto" : "hidden";
+}
+window.addEventListener("resize", zFit);
+
+function zShow(q){
+  const body = zEl("zbody"); body.innerHTML = ""; body.style.zoom = 1;
+  zPop(false);
+  if(!q){
+    const d = document.createElement("div"); d.className = "empty"; const em = {new: "You have seen every question here. Switch to Mixed or Missed.", missed: "Nothing to revisit. No missed questions in this selection.", liked: "No thumbs-up questions yet. Rate some with the thumb button."};
+    d.textContent = zbank.length ? (em[zui.mode] || "No questions match this filter.") : "Loading questions…";
+    body.appendChild(d); zcur = null; zMark(); return;
+  }
+  zcur = q; zans = false;
+  Z.shown = (Z.shown || 0) + 1; zRec(q.id).shown = Z.shown; zSave();
+  q._map = q.k ? q.o.map((_, i) => i) : zShuf(q.o.map((_, i) => i));
+  const cat = ZCAT[q.c] || ZCAT.ds;
+  const tag = document.createElement("div"); tag.className = "ztag"; tag.style.setProperty("--c", cat.c);
+  tag.textContent = cat.full + " · " + q.s + " · " + (q.l === "senior" ? "Senior" : "Basic");
+  body.appendChild(tag);
+  const pr = document.createElement("div"); pr.className = "qprompt"; pr.textContent = q.q; body.appendChild(pr);
+  if(q.code){ const c = document.createElement("pre"); c.className = "zcode"; c.textContent = q.code; body.appendChild(c); }
+  const opts = document.createElement("div"); opts.className = "opts";
+  q._map.forEach((oi, pos) => {
+    const b = document.createElement("button"); b.className = "opt"; b.dataset.pos = pos;
+    const l = document.createElement("span"); l.className = "l"; l.textContent = "ABCD"[pos];
+    const t = document.createElement("span"); t.textContent = q.o[oi];
+    b.appendChild(l); b.appendChild(t); opts.appendChild(b);
+  });
+  body.appendChild(opts);
+  const res = document.createElement("div"); res.id = "z-res"; res.className = "res show measure";
+  const rb = document.createElement("b"); rb.textContent = "Not quite. The answer is B) " + q.o[q.a];
+  const rs = document.createElement("span"); rs.textContent = q.why;
+  res.appendChild(rb); res.appendChild(rs); body.appendChild(res);
+  zEl("z-next").classList.remove("show");
+  zMark(); zFit();
+}
+function zAnswer(pos){
+  const q = zcur; if(!q || zans) return; zans = true;
+  const right = q._map.indexOf(q.a), ok = pos === right;
+  const btns = [...document.querySelectorAll("#zbody .opt")];
+  btns.forEach((b, i) => { if(i === right) b.classList.add("ok"); else if(i === pos) b.classList.add("bad"); else b.classList.add("dim"); });
+  const r = zRec(q.id);
+  r.n++; if(ok) r.c++;
+  if(ok) r.box = Math.min(4, r.box + 1); else r.box = 0;
+  Z.tick++; r.due = Z.tick + (ok ? ZINT[r.box] : 25); r.ts = Date.now();
+  zsess.n++; if(ok) zsess.c++;
+  zSave();
+  const res = zEl("z-res"); res.className = "res show " + (ok ? "right" : "wrong");
+  res.firstChild.textContent = ok ? "Correct." : "Not quite. The answer is " + "ABCD"[right] + ") " + q.o[q.a];
+  zEl("z-next").classList.add("show");
+  zScore(); zConcepts(); zFit();
+}
+function zNextQ(){ zShow(zChoose()); }
+zEl("zbody").addEventListener("click", e => { const b = e.target.closest(".opt"); if(b) zAnswer(+b.dataset.pos); });
+zEl("z-next").addEventListener("click", zNextQ);
+zEl("z-skip").addEventListener("click", zNextQ);
+
+/* ratings and flags */
+function zMark(){
+  const r = zcur ? Z.q[zcur.id] : null;
+  zEl("z-up").setAttribute("aria-pressed", r && r.rate === 1 ? "true" : "false");
+  zEl("z-down").setAttribute("aria-pressed", r && r.rate === -1 ? "true" : "false");
+  zEl("z-flag").setAttribute("aria-pressed", r && r.flags.length ? "true" : "false");
+  ["z-up", "z-down", "z-flag"].forEach(id => zEl(id).disabled = !zcur);
+}
+function zRate(v){ if(!zcur) return; const r = zRec(zcur.id); r.rate = r.rate === v ? 0 : v; zSave(); zMark(); zConcepts(); }
+zEl("z-up").addEventListener("click", () => zRate(1));
+zEl("z-down").addEventListener("click", () => zRate(-1));
+function zPop(show){
+  const p = zEl("z-pop");
+  if(!show){ p.hidden = true; return; }
+  const r = zRec(zcur.id); p.innerHTML = "";
+  const t = document.createElement("div"); t.className = "t"; t.textContent = "What is wrong with this question?"; p.appendChild(t);
+  ZREASON.forEach(([k, label]) => {
+    const b = document.createElement("button"); b.textContent = label; b.setAttribute("aria-pressed", r.flags.includes(k) ? "true" : "false");
+    b.addEventListener("click", () => {
+      const i = r.flags.indexOf(k); if(i < 0) r.flags.push(k); else r.flags.splice(i, 1);
+      b.setAttribute("aria-pressed", i < 0 ? "true" : "false"); zSave(); zMark(); zConcepts();
+    });
+    p.appendChild(b);
+  });
+  p.hidden = false;
+}
+zEl("z-flag").addEventListener("click", () => { if(zcur) zPop(zEl("z-pop").hidden); });
+document.addEventListener("click", e => { const p = zEl("z-pop"); if(!p.hidden && !e.target.closest("#z-pop") && !e.target.closest("#z-flag")) p.hidden = true; });
+
+/* header: filters, score */
+function zPills(){
+  const mk = (box, items, key) => {
+    box.innerHTML = "";
+    items.forEach(([v, label]) => {
+      const b = document.createElement("button"); b.className = "pill"; b.textContent = label;
+      b.dataset.v = v; b.setAttribute("aria-pressed", (key === "cat" ? (!zui.drill && zui.cat === v) : zui[key] === v) ? "true" : "false");
+      b.addEventListener("click", () => { zui[key] = v; if(key === "cat") zui.drill = ""; zSaveUi(); zPills(); zConcepts(); zShow(zChoose()); });
+      box.appendChild(b);
+    });
+  };
+  mk(zEl("z-cat"), [["all", "All"], ["bess", "BESS and energy"], ["ds", "Data science"], ["sw", "Software"]], "cat");
+  mk(zEl("z-lvl"), [["all", "All levels"], ["basic", "Basic"], ["senior", "Senior"]], "lvl");
+  mk(zEl("z-mode"), [["mixed", "Mixed"], ["new", "New"], ["missed", "Missed"], ["liked", "Liked"]], "mode");
+  zCounts();
+  const d = zEl("z-drill");
+  if(zui.drill){
+    const sb = zbank.find(q => q.s === zui.drill);
+    d.style.setProperty("--c", sb ? ZCAT[sb.c].c : "#eef1f6");
+    d.innerHTML = ""; const t = document.createElement("span"); t.style.cssText = "overflow:hidden;text-overflow:ellipsis"; t.textContent = zui.drill;
+    d.appendChild(t); const x = document.createElement("i"); x.innerHTML = IC("close"); d.appendChild(x); d.hidden = false;
+  } else d.hidden = true;
+}
+zEl("z-drill").addEventListener("click", () => { zui.drill = ""; zSaveUi(); zPills(); zConcepts(); zShow(zChoose()); });
+function zCounts(){
+  if(!zbank.length) return;
+  const pool = zPool(), R = q => Z.q[q.id], seen = q => R(q) && R(q).n > 0;
+  const n = {new: pool.filter(q => !seen(q)).length, missed: pool.filter(q => seen(q) && R(q).box === 0).length, liked: pool.filter(q => R(q) && R(q).rate === 1).length};
+  const lab = {new: "New", missed: "Missed", liked: "Liked"};
+  document.querySelectorAll("#z-mode .pill").forEach(b => { if(lab[b.dataset.v]) b.textContent = lab[b.dataset.v] + " " + n[b.dataset.v]; });
+}
+function zScore(){ zEl("z-score").textContent = zsess.n ? zsess.c + " / " + zsess.n + " this session" : ""; }
+
+/* concepts panel */
+function zConcepts(){
+  const st = zStats(), all = Object.values(st);
+  let n = 0, k = 0, seen = 0, tot = zbank.length, fl = 0, bad = 0;
+  zbank.forEach(q => { const r = Z.q[q.id]; if(!r) return; if(r.n){ n += r.n; k += r.c; seen++; } if(r.flags.length) fl++; if(r.rate === -1) bad++; });
+  zEl("z-stat").textContent = n ? "Answered " + n + " · Correct " + Math.round(100 * k / n) + "% · Seen " + seen + " of " + tot : "Seen 0 of " + tot + ". Answer a few to find your weak spots.";
+  const rows = all.filter(o => zui.cat === "all" || o.c === zui.cat).sort((a, b) => (b.n > 0) - (a.n > 0) || a.acc - b.acc || a.s.localeCompare(b.s)).slice(0, 8);
+  const box = zEl("z-list"); box.innerHTML = "";
+  rows.forEach(o => {
+    const b = document.createElement("button"); b.className = "zrow"; b.style.setProperty("--c", ZCAT[o.c].c);
+    b.setAttribute("aria-pressed", zui.drill === o.s ? "true" : "false");
+    const nm = document.createElement("span"); nm.className = "zn"; nm.textContent = o.s;
+    const v = document.createElement("span"); v.className = "zv"; v.textContent = o.n ? Math.round(100 * o.k / o.n) + "%" : "new";
+    const bar = document.createElement("i"); bar.className = "zbar"; const f = document.createElement("b"); f.style.width = (o.n ? 100 * o.k / o.n : 0) + "%"; bar.appendChild(f);
+    b.appendChild(nm); b.appendChild(v); b.appendChild(bar);
+    b.addEventListener("click", () => { zui.drill = zui.drill === o.s ? "" : o.s; zSaveUi(); zPills(); zConcepts(); zShow(zChoose()); });
+    box.appendChild(b);
+  });
+  zCounts();
+  const c = zEl("z-fbn"); c.hidden = !(fl + bad); c.textContent = fl + bad;
+}
+
+/* feedback export */
+function zReport(){
+  const L = [], line = q => q.q.replace(/\s+/g, " ").slice(0, 160);
+  const flagged = [], bad = [], good = [];
+  zbank.forEach(q => { const r = Z.q[q.id]; if(!r) return; if(r.flags.length) flagged.push(q); if(r.rate === -1) bad.push(q); if(r.rate === 1) good.push(q); });
+  L.push("QUIZ FEEDBACK · bank v" + zver + " · " + zbank.length + " questions · " + new Date().toISOString().slice(0, 10), "");
+  L.push("FLAGGED (" + flagged.length + ")");
+  flagged.forEach(q => { const r = Z.q[q.id]; L.push("- " + q.id + " [" + r.flags.map(f => (ZREASON.find(x => x[0] === f) || [0, f])[1]).join("; ") + "]", "  Q: " + line(q), "  Options: " + q.o.join(" | "), "  Marked answer: " + q.o[q.a]); });
+  L.push("", "BAD (" + bad.length + ")"); bad.forEach(q => L.push("- " + q.id + ": " + line(q)));
+  L.push("", "GOOD (" + good.length + ")"); good.forEach(q => L.push("- " + q.id));
+  L.push("", "WEAK CONCEPTS");
+  Object.values(zStats()).filter(o => o.n >= 3).sort((a, b) => a.acc - b.acc).slice(0, 10).forEach(o => L.push("- " + o.s + ": " + Math.round(100 * o.k / o.n) + "% (" + o.k + "/" + o.n + ")"));
+  return L.join("\n");
+}
+function zOpenFb(){ zEl("zf-text").value = zReport(); zEl("zf-sub").textContent = ""; zEl("zf-reset").textContent = "Reset progress"; zEl("zf-reset").dataset.armed = ""; zEl("zf-scrim").hidden = false; }
+zEl("z-fb").addEventListener("click", zOpenFb);
+zEl("zf-close").addEventListener("click", () => { zEl("zf-scrim").hidden = true; });
+zEl("zf-scrim").addEventListener("click", e => { if(e.target === zEl("zf-scrim")) zEl("zf-scrim").hidden = true; });
+zEl("zf-copy").addEventListener("click", async () => {
+  const ta = zEl("zf-text"), txt = ta.value; let ok = false;
+  try{ await navigator.clipboard.writeText(txt); ok = true; }catch(e){}
+  if(!ok){ try{ ta.removeAttribute("readonly"); ta.focus(); ta.select(); ta.setSelectionRange(0, txt.length); ok = document.execCommand("copy"); ta.setAttribute("readonly", ""); ta.blur(); }catch(e){} }
+  zEl("zf-sub").textContent = ok ? "Copied" : "Select the text and copy it";
+});
+zEl("zf-reset").addEventListener("click", e => {
+  const b = e.currentTarget;
+  if(!b.dataset.armed){ b.dataset.armed = "1"; b.textContent = "Tap again to erase everything"; return; }
+  Z = {tick: 0, shown: 0, q: {}}; zsess = {n: 0, c: 0}; zSave(); zScore(); zConcepts(); zShow(zChoose()); zEl("zf-scrim").hidden = true;
+});
+
+/* load the bank */
+paintIcons(zEl("pg-quiz"));
+zPills(); zScore();
+fetch("quiz.json", {cache: "no-cache"}).then(r => { if(!r.ok) throw 0; return r.json(); }).then(d => {
+  zbank = (d.questions || []).filter(q => q && q.o && q.o.length >= 2 && q.a >= 0 && q.a < q.o.length); zver = d.v || 1;
+  zbank.forEach(q => zById[q.id] = q);
+  if(zui.drill && !zbank.some(q => q.s === zui.drill)) zui.drill = "";
+  zPills(); zConcepts(); zShow(zChoose());
+}).catch(() => {
+  zEl("zbody").innerHTML = '<div class="empty">Could not load quiz.json. Upload it next to index.html in the repo, then refresh.</div>';
+});
+
+</script>
+</body>
+</html>
