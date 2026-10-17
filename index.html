@@ -525,7 +525,7 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
       <textarea id="w-ans" placeholder="Write your answer…" autocapitalize="sentences" spellcheck="false" autocorrect="off"></textarea>
       <div class="wcanvas" id="w-cwrap" hidden><canvas id="w-canvas"></canvas></div>
       <div class="wtools">
-        <div class="wtl" id="w-tpen" hidden><button class="ghost sm" id="w-undo">Undo</button><button class="ghost sm" id="w-clear">Clear</button><span class="whint">Apple Pencil only</span></div>
+        <div class="wtl" id="w-tpen" hidden><button class="ghost sm" id="w-undo">Undo</button><button class="ghost sm" id="w-clear">Clear</button><span class="whint" id="w-penhint">Apple Pencil only</span></div>
         <div class="wtl" id="w-tmic" hidden><button class="wmic" id="w-mic" aria-label="Start or stop speaking"><i data-ic="mic"></i></button><span class="whint" id="w-micmsg"></span></div>
         <span class="sp"></span>
         <div class="wcount" id="w-count"></div>
@@ -554,6 +554,7 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
       <div class="rowf"><input id="ws-model" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
       <small>Default gemini-3.8-flash. You can paste any other Gemini model ID from AI Studio.</small></div>
     <div id="ws-msg"></div>
+    <small id="ws-ver" style="font-size:1.7vmin;color:var(--dim)"></small>
     <div class="sfoot"><button class="danger" id="ws-del">Remove key</button><span class="sp"></span><button class="ghost" id="ws-test">Test</button><button class="ghost" id="ws-cancel">Close</button><button class="addbtn" id="ws-save">Save</button></div>
   </div>
 </div>
@@ -602,11 +603,12 @@ const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2, "0");
 const shuffle = a => { for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const pick = a => a[Math.floor(Math.random() * a.length)];
+const BUILD = "v 17 Oct 18:50";      // shown on screen so you can tell when the iPad has the latest version
 const status = {};
 function setStatus(k, v){ status[k] = v; $("foot").textContent = Object.values(status).filter(Boolean).join(" · ") ; renderFoot(); }
 function renderFoot(){
   const msgs = Object.values(status).filter(Boolean);
-  $("foot").textContent = (msgs.length ? msgs.join(" · ") + " — " : "") + "Weather: MeteoSwiss via Open-Meteo · Timetable: transport.opendata.ch";
+  $("foot").textContent = (msgs.length ? msgs.join(" · ") + " — " : "") + "Weather: MeteoSwiss via Open-Meteo · Timetable: transport.opendata.ch · " + BUILD;
 }
 renderFoot();
 
@@ -1736,11 +1738,11 @@ $("w-go").addEventListener("click", wGrade);
 
 /* answer input: type, pen (handwriting sent as a picture) or speak (speech-to-text in the browser) */
 const WIN = [["type", "Type", "#6cb4ff"], ["pen", "Pen", "#f2b45a"], ["speak", "Speak", "#41c98f"]];
-if(!WIN.some(x => x[0] === W.input)) W.input = "type";
+W.input = "type";                                                  // always start in typing mode
 (() => {
   const g = $("w-input");
   WIN.forEach(([v, label, c]) => { const b = el("button", "", label); b.dataset.v = v; b.style.setProperty("--c", c); g.appendChild(b); });
-  g.addEventListener("click", e => { const b = e.target.closest("button"); if(!b || wbusy) return; W.input = b.dataset.v; wSave(); wInputUI(); });
+  g.addEventListener("click", e => { const b = e.target.closest("button"); if(!b || wbusy) return; W.input = b.dataset.v; wInputUI(); });
 })();
 function wInputUI(){
   const m = W.input;
@@ -1794,9 +1796,10 @@ cv.addEventListener("pointermove", e => {
   (evs.length ? evs : [e]).forEach(x => PEN.cur.push(penPt(x)));
   penPaint(cctx, [PEN.cur.slice(start)], d, 0, 0, "#eef1f6");     // draw only the new segment
 });
-const penEnd = e => { if(PEN.cur && e.pointerId === PEN.cur.id){ PEN.cur = null; wSync(); } };
+const penEnd = e => { if(PEN.cur && e.pointerId === PEN.cur.id){ PEN.cur = null; penDraw(); wSync(); } };
 cv.addEventListener("pointerup", penEnd); cv.addEventListener("pointercancel", penEnd);
-cv.addEventListener("touchstart", e => { if([...e.touches].some(t => t.touchType !== "stylus")) e.preventDefault(); }, {passive: false});
+["touchstart", "touchmove"].forEach(t => cv.addEventListener(t, e => e.preventDefault(), {passive: false}));   // stop the page swiper (and Safari gestures) stealing Pencil strokes
+document.addEventListener("selectstart", e => { if(e.target === cv) e.preventDefault(); });
 $("w-undo").addEventListener("click", () => { PEN.strokes.pop(); penDraw(); wSync(); });
 $("w-clear").addEventListener("click", () => { PEN.strokes = []; penDraw(); wSync(); });
 // The picture sent to Gemini: dark ink on white, cropped to the writing, about 1400 px wide at most
@@ -2008,6 +2011,7 @@ function wMsg(t, cls){ const m = $("ws-msg"); m.textContent = t || ""; m.classNa
 function wOpenSettings(){
   $("ws-key").value = lsGet(LKEY); $("ws-key").type = "password"; $("ws-show").textContent = "Show";
   $("ws-model").value = lsGet(LMOD) || DEFAULT_MODEL; wMsg(lsGet(LKEY) ? "A key is saved on this device." : "No key saved yet.");
+  $("ws-ver").textContent = "Dashboard " + BUILD;
   $("ws-scrim").hidden = false;
 }
 const wCloseSettings = () => { $("ws-scrim").hidden = true; document.activeElement && document.activeElement.blur(); wPills(); if(!wgraded && !wbusy) wIdle(); };
