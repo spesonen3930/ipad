@@ -312,7 +312,22 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
 .wpaper{flex:1;min-height:12vmin;display:flex;flex-direction:column;margin-top:1.6vmin;background:rgba(5,8,14,.45);border:1px solid var(--line);border-radius:2vmin;padding:1.2vmin 2vmin .8vmin}
 #w-ans{flex:1;min-height:0;width:100%;resize:none;background:repeating-linear-gradient(transparent 0 5vmin,rgba(160,185,230,.14) 5vmin calc(5vmin + 1px));background-attachment:local;border:0;outline:0;color:var(--fg);font:inherit;font-size:2.8vmin;line-height:5vmin;padding:0;-webkit-user-select:text;user-select:text;caret-color:var(--warm)}
 #w-ans::placeholder{color:#66748f;font-weight:300}
-.wcount{font-size:1.8vmin;color:var(--dim);text-align:right;font-variant-numeric:tabular-nums}
+.wcount{font-size:1.8vmin;color:var(--dim);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+#w-ans[hidden]{display:none}
+.wcanvas{flex:1;min-height:0;position:relative;background:repeating-linear-gradient(transparent 0 5vmin,rgba(160,185,230,.14) 5vmin calc(5vmin + 1px))}
+.wcanvas[hidden]{display:none}
+#w-canvas{position:absolute;inset:0;display:block;touch-action:none;cursor:crosshair}
+.wtools{flex:none;display:flex;align-items:center;gap:1.2vmin;min-height:5.4vmin;margin-top:.6vmin;min-width:0}
+.wtools .sp{flex:1}
+.wtl{display:flex;align-items:center;gap:1vmin;min-width:0}.wtl[hidden]{display:none}
+.ghost.sm{height:4.8vmin;font-size:1.9vmin;padding:0 1.8vmin;flex:none}
+.whint{font-size:1.8vmin;color:var(--dim);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wmic{flex:none;width:6vmin;height:6vmin;border-radius:50%;border:1px solid var(--line);background:var(--card2);display:grid;place-items:center;padding:0}
+.wmic svg.ic{font-size:3vmin;stroke:var(--ok)}
+.wmic.on{background:var(--ok);border-color:var(--ok);animation:wpulse 1.4s infinite}.wmic.on svg.ic{stroke:#06241a}
+@keyframes wpulse{0%{box-shadow:0 0 0 0 rgba(65,201,143,.5)}100%{box-shadow:0 0 0 2vmin rgba(65,201,143,0)}}
+.wseg{flex:none;gap:.6vmin}.wseg button{flex:none;height:4.8vmin;font-size:1.9vmin;padding:0 1.6vmin}
+.wread{color:#cdd6e6;font-style:italic;border-left:.4vmin solid var(--line);padding:.2vmin 0 .2vmin 1.6vmin}
 .wfoot{display:flex;align-items:center;gap:1.2vmin;height:6.4vmin;margin-top:1.4vmin}
 .wfoot .sp{flex:1}
 .wfoot .ghost{height:100%}
@@ -507,7 +522,14 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
     <div class="wsub" id="w-sub"></div>
     <div class="wpaper">
       <textarea id="w-ans" placeholder="Write your answer…" autocapitalize="sentences" spellcheck="false" autocorrect="off"></textarea>
-      <div class="wcount" id="w-count"></div>
+      <div class="wcanvas" id="w-cwrap" hidden><canvas id="w-canvas"></canvas></div>
+      <div class="wtools">
+        <div class="wtl" id="w-tpen" hidden><button class="ghost sm" id="w-undo">Undo</button><button class="ghost sm" id="w-clear">Clear</button><span class="whint">Apple Pencil only</span></div>
+        <div class="wtl" id="w-tmic" hidden><button class="wmic" id="w-mic" aria-label="Start or stop speaking"><i data-ic="mic"></i></button><span class="whint" id="w-micmsg"></span></div>
+        <span class="sp"></span>
+        <div class="wcount" id="w-count"></div>
+        <div class="seg wseg" id="w-input"></div>
+      </div>
     </div>
     <div class="wfoot">
       <button class="ghost" id="w-skip">New question</button>
@@ -627,6 +649,7 @@ const IC = (()=>{
     down:    d => '<g transform="rotate(180 12 12)"><path d="M7 11v9H4v-9zM7 11l4-8a2 2 0 0 1 2 2l-1 4h6.5a2 2 0 0 1 2 2.3l-1.2 6.5a2 2 0 0 1-2 1.7H7"/></g>',
     flag:    d => '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
     close:   d => '<path d="M6 6l12 12M18 6L6 18"/>',
+    mic:     d => '<path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',
     star:    d => '<path d="M12 3.2l2.7 5.5 6 .9-4.35 4.25 1 6L12 17l-5.35 2.85 1-6L3.3 9.6l6-.9z"/>',
     gear:    d => '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'
   };
@@ -1616,7 +1639,7 @@ const LKEY = "dash.llm.key", LMOD = "dash.llm.model", WST = "dash.write.v1", DEF
 const lsGet = k => { try{ return localStorage.getItem(k) || ""; }catch(e){ return ""; } };
 const lsSet = (k, v) => { try{ if(v) localStorage.setItem(k, v); else localStorage.removeItem(k); }catch(e){} };
 const WMODES = [["de", "Deutsch B1"], ["ds", "Interview · Senior DS"]];
-let W = {mode: "de", seen: {de: [], ds: []}, log: [], star: [], onlyStar: false, last: {}};
+let W = {mode: "de", input: "type", seen: {de: [], ds: []}, log: [], star: [], onlyStar: false, last: {}};
 try{ const s = JSON.parse(localStorage.getItem(WST) || "null"); if(s && s.seen && s.log) W = Object.assign(W, s); }catch(e){}
 if(!Array.isArray(W.star)) W.star = []; if(!W.last || typeof W.last !== "object") W.last = {};
 const wSave = () => { try{ localStorage.setItem(WST, JSON.stringify(W)); }catch(e){} };
@@ -1653,7 +1676,7 @@ function wPick(){
 }
 function wShow(q){
   wcur = q; wgraded = false;
-  $("w-ans").value = ""; wSync();
+  micStop(); $("w-ans").value = ""; PEN.strokes = []; penDraw(); wSync(); micUI();
   wStarBtn();
   if(!q){ $("w-tag").textContent = ""; $("w-sub").textContent = "";
     $("w-prompt").textContent = W.mode === "ds" && W.onlyStar && wbank.ds.length ? "No starred questions yet. Tap ☆ on a question to save it for later." : "Could not load write.json. Upload it next to index.html in the repo, then refresh.";
@@ -1699,9 +1722,9 @@ function wIdle(){
   box.append(d);
 }
 function wSync(){
-  const v = $("w-ans").value.trim(), n = v ? v.split(/\s+/).length : 0;
-  $("w-count").textContent = n ? n + (n === 1 ? " word" : " words") : "";
-  $("w-go").disabled = wbusy || !wcur || n < 2;
+  const v = $("w-ans").value.trim(), n = v ? v.split(/\s+/).length : 0, pen = W.input === "pen";
+  $("w-count").textContent = pen ? "" : n ? n + (n === 1 ? " word" : " words") : "";
+  $("w-go").disabled = wbusy || !wcur || (pen ? !PEN.strokes.length : n < 2);
   $("w-golbl").textContent = wbusy ? "Reading…" : wgraded ? "Grade again" : "Get feedback";
   $("w-go").classList.toggle("busy", wbusy);
 }
@@ -1709,6 +1732,118 @@ $("w-ans").addEventListener("input", wSync);
 $("w-ans").addEventListener("keydown", e => { if(e.key === "Enter" && (e.metaKey || e.ctrlKey)){ e.preventDefault(); if(!$("w-go").disabled) wGrade(); } });
 $("w-skip").addEventListener("click", () => { if(!wbusy) wNext(); });
 $("w-go").addEventListener("click", wGrade);
+
+/* answer input: type, pen (handwriting sent as a picture) or speak (speech-to-text in the browser) */
+const WIN = [["type", "Type", "#6cb4ff"], ["pen", "Pen", "#f2b45a"], ["speak", "Speak", "#41c98f"]];
+if(!WIN.some(x => x[0] === W.input)) W.input = "type";
+(() => {
+  const g = $("w-input");
+  WIN.forEach(([v, label, c]) => { const b = el("button", "", label); b.dataset.v = v; b.style.setProperty("--c", c); g.appendChild(b); });
+  g.addEventListener("click", e => { const b = e.target.closest("button"); if(!b || wbusy) return; W.input = b.dataset.v; wSave(); wInputUI(); });
+})();
+function wInputUI(){
+  const m = W.input;
+  [...$("w-input").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.v === m ? "true" : "false"));
+  $("w-ans").hidden = m === "pen"; $("w-cwrap").hidden = m !== "pen";
+  $("w-tpen").hidden = m !== "pen"; $("w-tmic").hidden = m !== "speak";
+  if(m !== "speak") micStop();
+  if(m === "pen") requestAnimationFrame(penSize);
+  micUI(); wSync();
+}
+
+/* pen: strokes are kept in CSS pixels so they survive a resize; only the Pencil (or a mouse) draws, fingers and palms are ignored */
+const PEN = {strokes: [], cur: null};
+const cv = $("w-canvas"), cctx = cv.getContext("2d");
+const penW = () => Math.max(1.4, Math.min(innerWidth, innerHeight) * .0042);
+function penPaint(ctx, strokes, k, dx, dy, color){
+  ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.strokeStyle = color; ctx.fillStyle = color;
+  const base = penW();
+  strokes.forEach(st => {
+    if(st.length === 1){ ctx.beginPath(); ctx.arc((st[0].x + dx) * k, (st[0].y + dy) * k, base * k * .6, 0, 7); ctx.fill(); return; }
+    for(let i = 1; i < st.length; i++){
+      const a = st[i - 1], b = st[i];
+      ctx.lineWidth = base * k * (.6 + .8 * (b.p || .5));
+      ctx.beginPath(); ctx.moveTo((a.x + dx) * k, (a.y + dy) * k); ctx.lineTo((b.x + dx) * k, (b.y + dy) * k); ctx.stroke();
+    }
+  });
+}
+function penDraw(){
+  const d = devicePixelRatio || 1;
+  cctx.setTransform(1, 0, 0, 1, 0, 0); cctx.clearRect(0, 0, cv.width, cv.height);
+  penPaint(cctx, PEN.strokes, d, 0, 0, "#eef1f6");
+}
+function penSize(){
+  const r = $("w-cwrap").getBoundingClientRect(), d = devicePixelRatio || 1;
+  if(!r.width || !r.height) return;
+  cv.width = Math.round(r.width * d); cv.height = Math.round(r.height * d); penDraw();
+}
+window.addEventListener("resize", () => { if(W.input === "pen") penSize(); });
+const penPt = e => { const r = cv.getBoundingClientRect(); return {x: e.clientX - r.left, y: e.clientY - r.top, p: e.pointerType === "pen" ? e.pressure : .5}; };
+cv.addEventListener("pointerdown", e => {
+  if(e.pointerType === "touch" || wbusy) return;
+  e.preventDefault(); try{ cv.setPointerCapture(e.pointerId); }catch(_){}
+  PEN.cur = [penPt(e)]; PEN.cur.id = e.pointerId; PEN.strokes.push(PEN.cur); penDraw(); wSync();
+});
+cv.addEventListener("pointermove", e => {
+  if(!PEN.cur || e.pointerId !== PEN.cur.id) return;
+  e.preventDefault();
+  const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+  const d = devicePixelRatio || 1, start = PEN.cur.length - 1;
+  (evs.length ? evs : [e]).forEach(x => PEN.cur.push(penPt(x)));
+  penPaint(cctx, [PEN.cur.slice(start)], d, 0, 0, "#eef1f6");     // draw only the new segment
+});
+const penEnd = e => { if(PEN.cur && e.pointerId === PEN.cur.id){ PEN.cur = null; wSync(); } };
+cv.addEventListener("pointerup", penEnd); cv.addEventListener("pointercancel", penEnd);
+cv.addEventListener("touchstart", e => { if([...e.touches].some(t => t.touchType !== "stylus")) e.preventDefault(); }, {passive: false});
+$("w-undo").addEventListener("click", () => { PEN.strokes.pop(); penDraw(); wSync(); });
+$("w-clear").addEventListener("click", () => { PEN.strokes = []; penDraw(); wSync(); });
+// The picture sent to Gemini: dark ink on white, cropped to the writing, about 1400 px wide at most
+function penImage(){
+  const pts = PEN.strokes.flat(); if(!pts.length) return null;
+  const pad = 18;
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  pts.forEach(p => { x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y); x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y); });
+  const w = x1 - x0 + pad * 2, h = y1 - y0 + pad * 2, k = Math.min(2, 1400 / w, 1400 / h);
+  const c = document.createElement("canvas"); c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+  const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height);
+  penPaint(x, PEN.strokes, k, pad - x0, pad - y0, "#111");
+  return c.toDataURL("image/png").split(",")[1];
+}
+function withRead(schema){
+  const s = JSON.parse(JSON.stringify(schema));
+  s.properties = Object.assign({read: S("STRING")}, s.properties);
+  s.required = ["read"].concat(s.required); s.propertyOrdering = ["read"].concat(s.propertyOrdering);
+  return s;
+}
+
+/* speak: the browser's own speech recognition (free, nothing goes to Gemini until you tap Get feedback) */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, recOn = false, recBase = "", recMsg = "";
+function micUI(){
+  $("w-mic").classList.toggle("on", recOn);
+  $("w-micmsg").textContent = recOn ? "Listening… tap to stop. You can fix words by typing."
+    : recMsg || (SR ? "Tap the mic and speak " + (W.mode === "de" ? "German" : "English") : "Speech-to-text isn't available here. Use the 🎤 on the iPad keyboard.");
+}
+function micStop(){ if(rec){ try{ rec.stop(); }catch(e){} } }
+function micStart(){
+  recMsg = "";
+  if(!SR){ micUI(); $("w-ans").focus(); return; }
+  const ta = $("w-ans"); recBase = ta.value.trim();
+  rec = new SR(); rec.lang = W.mode === "de" ? "de-DE" : "en-GB"; rec.continuous = true; rec.interimResults = true;
+  rec.onresult = e => {
+    let t = ""; for(let i = 0; i < e.results.length; i++) t += " " + e.results[i][0].transcript;
+    ta.value = ((recBase ? recBase + " " : "") + t).replace(/\s+/g, " ").trim(); wSync();
+  };
+  rec.onerror = e => {
+    recMsg = e.error === "not-allowed" || e.error === "service-not-allowed" ? "Microphone blocked. Allow microphone access for this site in Safari's settings."
+      : e.error === "no-speech" ? "Didn't hear anything. Tap the mic and try again."
+      : e.error === "aborted" ? "" : "Speech recognition stopped (" + e.error + "). Tap the mic to continue.";
+  };
+  rec.onend = () => { recOn = false; rec = null; micUI(); };
+  try{ rec.start(); recOn = true; }catch(e){ recMsg = "Couldn't start the microphone."; rec = null; }
+  micUI();
+}
+$("w-mic").addEventListener("click", () => { if(wbusy) return; if(recOn) micStop(); else micStart(); });
 
 /* prompts and answer formats */
 const SYS_DE = [
@@ -1768,7 +1903,7 @@ function geminiError(status, msg, model){
 async function gemini(system, user, schema){
   const key = lsGet(LKEY), model = lsGet(LMOD) || DEFAULT_MODEL;
   const url = "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent";
-  const base = {systemInstruction: {parts: [{text: system}]}, contents: [{role: "user", parts: [{text: user}]}]};
+  const base = {systemInstruction: {parts: [{text: system}]}, contents: [{role: "user", parts: Array.isArray(user) ? user : [{text: user}]}]};
   // First try with low thinking (cheaper, faster). If the model rejects an option (HTTP 400), retry with a simpler request.
   const configs = [
     {responseMimeType: "application/json", responseSchema: schema, thinkingConfig: {thinkingLevel: "low"}},
@@ -1799,19 +1934,29 @@ async function gemini(system, user, schema){
 async function wGrade(){
   if(wbusy || !wcur) return;
   if(!lsGet(LKEY)){ wOpenSettings(); return; }
-  const ans = $("w-ans").value.trim(); if(ans.split(/\s+/).length < 2) return;
-  const q = wcur, mode = W.mode;
+  const how = W.input, q = wcur, mode = W.mode;
+  let ans = "", img = null;
+  if(how === "pen"){ img = penImage(); if(!img) return; }
+  else { ans = $("w-ans").value.trim(); if(ans.split(/\s+/).length < 2) return; }
+  micStop();
   wbusy = true; wSync(); $("w-ans").blur();
-  const box = $("w-fb"); box.innerHTML = ""; box.append(el("div", "wempty", mode === "de" ? "Checking your German…" : "Reading your answer…"));
+  const box = $("w-fb"); box.innerHTML = ""; box.append(el("div", "wempty", how === "pen" ? "Reading your handwriting…" : mode === "de" ? "Checking your German…" : "Reading your answer…"));
   try{
-    const out = mode === "de"
-      ? await gemini(SYS_DE, "Task (" + q.t + "): " + q.p + "\nWhat the task asks for: " + q.h + "\n\nLearner's answer:\n" + ans, SCHEMA_DE)
-      : await gemini(SYS_DS, "Question (" + q.t + "): " + q.p + "\nKey points an interviewer looks for:\n- " + q.k.join("\n- ") + "\n\nCandidate's answer:\n" + ans, SCHEMA_DS);
+    const head = mode === "de"
+      ? "Task (" + q.t + "): " + q.p + "\nWhat the task asks for: " + q.h
+      : "Question (" + q.t + "): " + q.p + "\nKey points an interviewer looks for:\n- " + q.k.join("\n- ");
+    const note = how === "pen" ? "Input: a picture of the handwritten answer is attached. First copy it exactly into 'read', keeping every mistake as written (do not correct anything while copying; write [?] for a word you can't read). Then grade what you read."
+      : how === "speak" ? "Input: spoken aloud and turned into text by speech recognition. Punctuation and capitals come from the recognizer, so ignore them. If a word looks like a mis-hearing of a correct word, treat it as a slip, not an error."
+      : "Input: typed or handwritten with Scribble on an iPad.";
+    const parts = [{text: head + "\n" + note + "\n\n" + (mode === "de" ? "Learner's answer:" : "Candidate's answer:") + "\n" + (img ? "(see the attached picture)" : ans)}];
+    if(img) parts.push({inlineData: {mimeType: "image/png", data: img}});
+    const base = mode === "de" ? SCHEMA_DE : SCHEMA_DS;
+    const out = await gemini(mode === "de" ? SYS_DE : SYS_DS, parts, img ? withRead(base) : base);
     if(wcur !== q) return;                                          // question changed while waiting
     const r = Math.max(1, Math.min(5, Math.round(+out.rating) || 1));
     W.last[q.id] = r; W.log.push({m: mode, id: q.id, r, ts: Date.now()}); if(W.log.length > 400) W.log.splice(0, W.log.length - 400); wSave();
     if(mode === "de"){ deTotal++; try{ localStorage.setItem("dash.de.total", deTotal); }catch(e){} }
-    wgraded = true; wRender(out, r, mode);
+    wgraded = true; wRender(out, r, mode, how);
   }catch(e){
     if(wcur !== q) return;
     box.innerHTML = ""; box.append(el("div", "werror", e.message || String(e)));
@@ -1819,12 +1964,13 @@ async function wGrade(){
 }
 function wSec(title, node){ const s = el("div", "wsec"); s.append(el("h4", "", title), node); return s; }
 function wList(items, c){ const u = el("ul", "wlist"); u.style.setProperty("--c", c); (items || []).filter(Boolean).forEach(t => u.append(el("li", "", t))); return u; }
-function wRender(o, r, mode){
+function wRender(o, r, mode, how){
   const rate = $("w-rate"); rate.innerHTML = ""; rate.style.setProperty("--c", RCOL[r]);
   for(let i = 1; i <= 5; i++) rate.append(el("i", i <= r ? "on" : ""));
   rate.hidden = false;
   const box = $("w-fb"); box.innerHTML = ""; box.scrollTop = 0;
   const v = el("div", "wverdict", (o.verdict || "") + "  ·  " + r + "/5"); v.style.setProperty("--c", RCOL[r]); box.append(v);
+  if(how === "pen" && o.read) box.append(wSec("What I read", el("div", "wread", o.read)));
   if(mode === "de"){
     const errs = Array.isArray(o.errors) ? o.errors.filter(x => x && (x.wrong || x.right)) : [];
     if(errs.length){
@@ -1885,7 +2031,7 @@ $("ws-test").addEventListener("click", async () => {
   }catch(e){ wMsg("Couldn't reach Gemini. Check the internet connection.", "bad"); }
 });
 
-paintIcons(zEl("pg-write")); wPills();
+paintIcons(zEl("pg-write")); wPills(); wInputUI();
 fetch("write.json", {cache: "no-cache"}).then(r => { if(!r.ok) throw 0; return r.json(); }).then(d => {
   wbank = {de: (d.de || []).filter(q => q && q.id && q.p), ds: (d.ds || []).filter(q => q && q.id && q.p && Array.isArray(q.k))};
   wPills(); wNext();
