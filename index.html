@@ -314,9 +314,9 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
 #w-ans::placeholder{color:#66748f;font-weight:300}
 .wcount{font-size:1.8vmin;color:var(--dim);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 #w-ans[hidden]{display:none}
-.wcanvas{flex:1;min-height:0;position:relative;overflow:hidden;background:repeating-linear-gradient(transparent 0 5vmin,rgba(160,185,230,.14) 5vmin calc(5vmin + 1px))}
+.wcanvas{flex:1;min-height:0;position:relative;overflow:hidden;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;background:repeating-linear-gradient(transparent 0 5vmin,rgba(160,185,230,.14) 5vmin calc(5vmin + 1px))}
 .wcanvas[hidden]{display:none}
-#w-canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+#w-canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 .wtools{position:relative;z-index:2}
 .wtools{flex:none;display:flex;align-items:center;gap:1.2vmin;min-height:5.4vmin;margin-top:.6vmin;min-width:0}
 .wtools .sp{flex:1}
@@ -603,7 +603,7 @@ const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2, "0");
 const shuffle = a => { for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const pick = a => a[Math.floor(Math.random() * a.length)];
-const BUILD = "v 17 Oct 18:50";      // shown on screen so you can tell when the iPad has the latest version
+const BUILD = "v 17 Oct 19:00";      // shown on screen so you can tell when the iPad has the latest version
 const status = {};
 function setStatus(k, v){ status[k] = v; $("foot").textContent = Object.values(status).filter(Boolean).join(" · ") ; renderFoot(); }
 function renderFoot(){
@@ -1800,6 +1800,7 @@ const penEnd = e => { if(PEN.cur && e.pointerId === PEN.cur.id){ PEN.cur = null;
 cv.addEventListener("pointerup", penEnd); cv.addEventListener("pointercancel", penEnd);
 ["touchstart", "touchmove"].forEach(t => cv.addEventListener(t, e => e.preventDefault(), {passive: false}));   // stop the page swiper (and Safari gestures) stealing Pencil strokes
 document.addEventListener("selectstart", e => { if(e.target === cv) e.preventDefault(); });
+["contextmenu", "gesturestart", "dblclick"].forEach(t => $("w-cwrap").addEventListener(t, e => e.preventDefault()));   // a long Pencil press otherwise opens Safari's menu
 $("w-undo").addEventListener("click", () => { PEN.strokes.pop(); penDraw(); wSync(); });
 $("w-clear").addEventListener("click", () => { PEN.strokes = []; penDraw(); wSync(); });
 // The picture sent to Gemini: dark ink on white, cropped to the writing, about 1400 px wide at most
@@ -1823,32 +1824,42 @@ function withRead(schema){
 
 /* speak: the browser's own speech recognition (free, nothing goes to Gemini until you tap Get feedback) */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec = null, recOn = false, recBase = "", recMsg = "";
+// Safari stops listening after a short pause, so while you want it on (recWant) it quietly restarts and keeps your text.
+let rec = null, recWant = false, recBase = "", recMsg = "", recStarts = [];
+const recOn = () => recWant;
 function micUI(){
-  $("w-mic").classList.toggle("on", recOn);
-  $("w-micmsg").textContent = recOn ? "Listening… tap to stop. You can fix words by typing."
-    : recMsg || (SR ? "Tap the mic and speak " + (W.mode === "de" ? "German" : "English") : "Speech-to-text isn't available here. Use the 🎤 on the iPad keyboard.");
+  $("w-mic").classList.toggle("on", recWant);
+  $("w-micmsg").textContent = recWant ? "Listening… tap the mic to stop. Fix words by typing."
+    : recMsg || (SR ? "Tap the mic and speak " + (W.mode === "de" ? "German" : "English") : "Speech-to-text isn't available here. Tap the box and use the 🎤 on the keyboard.");
 }
-function micStop(){ if(rec){ try{ rec.stop(); }catch(e){} } }
-function micStart(){
-  recMsg = "";
-  if(!SR){ micUI(); $("w-ans").focus(); return; }
+function micStop(){ recWant = false; if(rec){ try{ rec.stop(); }catch(e){} } micUI(); }
+function recStart(){
+  const now = Date.now(); recStarts = recStarts.filter(t => now - t < 5000); recStarts.push(now);
+  if(recStarts.length > 6){ recWant = false; recMsg = "Speech recognition keeps stopping. Tap the box and use the 🎤 on the keyboard instead."; micUI(); return; }
   const ta = $("w-ans"); recBase = ta.value.trim();
-  rec = new SR(); rec.lang = W.mode === "de" ? "de-DE" : "en-GB"; rec.continuous = true; rec.interimResults = true;
-  rec.onresult = e => {
+  const r = new SR(); rec = r;
+  r.lang = W.mode === "de" ? "de-DE" : "en-GB"; r.continuous = true; r.interimResults = true;
+  r.onresult = e => {
     let t = ""; for(let i = 0; i < e.results.length; i++) t += " " + e.results[i][0].transcript;
     ta.value = ((recBase ? recBase + " " : "") + t).replace(/\s+/g, " ").trim(); wSync();
   };
-  rec.onerror = e => {
-    recMsg = e.error === "not-allowed" || e.error === "service-not-allowed" ? "Microphone blocked. Allow microphone access for this site in Safari's settings."
-      : e.error === "no-speech" ? "Didn't hear anything. Tap the mic and try again."
-      : e.error === "aborted" ? "" : "Speech recognition stopped (" + e.error + "). Tap the mic to continue.";
+  r.onerror = e => {
+    if(["not-allowed", "service-not-allowed", "audio-capture", "language-not-supported"].includes(e.error)){
+      recWant = false;
+      recMsg = e.error === "audio-capture" ? "No microphone found." : e.error === "language-not-supported" ? "This language isn't supported for speech here."
+        : "Speech recognition isn't allowed. Allow the microphone for this site, make sure Dictation is on in iPad Settings (General → Keyboard), or use the 🎤 on the keyboard.";
+    }
   };
-  rec.onend = () => { recOn = false; rec = null; micUI(); };
-  try{ rec.start(); recOn = true; }catch(e){ recMsg = "Couldn't start the microphone."; rec = null; }
+  r.onend = () => { if(rec === r) rec = null; if(recWant) setTimeout(() => { if(recWant && !rec) recStart(); }, 120); micUI(); };
+  try{ r.start(); }catch(e){ recWant = false; recMsg = "Couldn't start the microphone."; }
   micUI();
 }
-$("w-mic").addEventListener("click", () => { if(wbusy) return; if(recOn) micStop(); else micStart(); });
+function micStart(){
+  recMsg = "";
+  if(!SR){ micUI(); $("w-ans").focus(); return; }
+  recWant = true; recStarts = []; recStart();
+}
+$("w-mic").addEventListener("click", () => { if(wbusy) return; if(recWant) micStop(); else micStart(); });
 
 /* prompts and answer formats */
 const SYS_DE = [
