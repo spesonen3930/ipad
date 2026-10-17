@@ -217,30 +217,8 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
 .zpop .t{font-size:1.9vmin;color:var(--dim);padding:0 .6vmin .3vmin}
 .zpop button{height:5.4vmin;border-radius:1.2vmin;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--fg);font-size:2.2vmin;text-align:left;padding:0 1.6vmin}
 .zpop button[aria-pressed=true]{border-color:#ff7070;background:rgba(255,112,112,.14)}
-
-.zq [hidden]{display:none!important}
-.cbody .cfront{font-size:4.2vmin;line-height:1.28;margin:1.4vmin 0 1vmin}
-.cbody .cdiv{height:1px;background:var(--line);margin:1.6vmin 0 1.4vmin}
-.cbody .cback{font-size:2.9vmin;line-height:1.38}
-.cbody .cx{margin-top:1.2vmin;border-left:.4vmin solid var(--line);padding:.3vmin 0 .3vmin 1.6vmin;font-size:2.3vmin;line-height:1.4;color:var(--dim)}
-.cbody .hid{visibility:hidden}
-.cg{height:6vmin;border-radius:1.4vmin;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--fg);font-size:2.4vmin;padding:0 3vmin;font-weight:600}
-.cg.miss{border-color:var(--bad);color:#ff9a9a}
-.cg.almost{border-color:var(--warm);color:var(--warm)}
-.cg.got{border-color:var(--ok);background:rgba(65,201,143,.14);color:var(--ok)}
 .zc{display:flex;flex-direction:column;min-height:0;min-width:0;padding:2vmin 2.2vmin 1.8vmin}
 .zc h3{font-size:2.5vmin;font-weight:600}
-.zfig{display:none;flex-direction:column;min-height:0;flex:1}
-.zc.showfig>:not(.zfig){display:none}.zc.showfig .zfig{display:flex}
-.zfig h3{margin-bottom:1vmin}
-.zfig svg{width:100%;flex:1;min-height:0;max-height:100%;background:#0a0f19;border:1px solid var(--line);border-radius:1.4vmin}
-.zfig p{font-size:2vmin;line-height:1.45;color:#cdd6e6;margin-top:1.2vmin}
-.zfig svg .ax{stroke:#8794ab;stroke-width:1.5;fill:none}.zfig svg .ln{stroke:var(--cool);stroke-width:2.5;fill:none}
-.zfig svg .l2{stroke:var(--warm);stroke-width:2.5;fill:none}.zfig svg .l3{stroke:var(--ok);stroke-width:2.5;fill:none}
-.zfig svg .l4{stroke:var(--bad);stroke-width:2.5;fill:none}.zfig svg .dsh{stroke-dasharray:6 5}
-.zfig svg .bx{stroke:#8794ab;stroke-width:1.5;fill:#172033}.zfig svg .fl{fill:rgba(108,180,255,.18);stroke:none}
-.zfig svg text{fill:#cdd6e6;font:13px -apple-system,system-ui,sans-serif}.zfig svg .sm{font-size:11px;fill:#8794ab}
-.zfig svg .dot{fill:var(--warm)}
 .zstat{font-size:1.9vmin;color:var(--dim);margin:.6vmin 0 1.4vmin;line-height:1.4;font-variant-numeric:tabular-nums}
 .zlist{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:.9vmin}
 .zrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.5vmin 1vmin;align-items:center;text-align:left;width:100%;padding:1.1vmin 1.4vmin;border-radius:1.4vmin;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--fg);font-size:2vmin}
@@ -254,27 +232,6 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
 .zcb i{font-style:normal;font-size:1.7vmin;border-radius:99px;padding:.2vmin 1vmin;background:rgba(255,112,112,.18);color:#ff9a9a}
 #zf-text{height:44vmin;width:100%;resize:none;background:#0a0f19;border:1px solid var(--line);border-radius:1.4vmin;color:#cfe0ff;font:1.9vmin/1.45 ui-monospace,"SF Mono",Menlo,monospace;padding:1.4vmin;-webkit-user-select:text;user-select:text;outline:0}
 
-/* ---- word of the day ---- */
-.wotd{flex:none;padding:1.6vmin 2.2vmin;display:flex;flex-direction:column;gap:.5vmin;min-height:0;overflow:hidden}
-.wotd .wk{font-size:1.7vmin;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
-.wotd .ww{font-size:4.2vmin;font-weight:600;color:var(--fg);line-height:1.1}
-.wotd .we{font-size:2.3vmin;color:var(--warm)}
-.wotd .wx{font-size:2.1vmin;color:#cdd6e6;line-height:1.35}
-/* ---- race ---- */
-.page.racepage{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,1fr);gap:2.4vmin}
-.lane{display:flex;flex-direction:column;justify-content:center;gap:1.4vmin;min-height:0}
-.lh{display:flex;align-items:baseline;gap:2vmin;flex-wrap:wrap}
-.lh .ln1{font-size:3.4vmin;font-weight:600;color:var(--c)}
-.lh .lc{font-size:7vmin;font-weight:200;font-variant-numeric:tabular-nums;line-height:1}
-.lh .lg{font-size:2.4vmin;color:var(--dim);font-variant-numeric:tabular-nums}
-.lh .lv{margin-left:auto;font-size:1.9vmin;border-radius:99px;padding:.5vmin 1.4vmin;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c)}
-.track{position:relative;height:17vmin;border-radius:2vmin;background:#1a2132;border:1px solid var(--line);overflow:hidden}
-.track::before{content:"";position:absolute;left:0;right:0;top:50%;height:.5vmin;transform:translateY(-50%);background:repeating-linear-gradient(90deg,rgba(255,255,255,.35) 0 4vmin,transparent 4vmin 8vmin)}
-.track .fin{position:absolute;right:0;top:0;bottom:0;width:4vmin;background:conic-gradient(#fff 25%,#111 0 50%,#fff 0 75%,#111 0) 0 0/2vmin 2vmin}
-.track .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--c) 22%,transparent));transition:width 1.8s cubic-bezier(.2,.8,.2,1)}
-.car{position:absolute;top:50%;left:0;width:20vmin;height:9vmin;margin-top:-4.5vmin;transition:left 1.8s cubic-bezier(.2,.8,.2,1)}
-.car svg{width:100%;height:100%;display:block}
-.lt{display:flex;justify-content:space-between;font-size:2vmin;color:var(--dim);font-variant-numeric:tabular-nums}
 /* ---- portrait fallback ---- */
 @media (orientation:portrait){
   .page,.page.todopage,.page.quizpage{grid-template-columns:1fr;grid-template-rows:none;overflow-y:auto;align-content:start}
@@ -302,7 +259,6 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
     <div class="sun"><span><i data-ic="sunrise"></i><b id="sunrise">--:--</b></span><span><i data-ic="sunset"></i><b id="sunset">--:--</b></span><span class="uv"><i class="uvk">UV</i><b id="uv">–</b><em id="uvl"></em></span></div>
   </div>
   <div class="hours" id="hours"></div>
-  <div class="card wotd" id="wotd"><div class="wk">Wort des Tages · B2–C1</div><div class="ww" id="ww">…</div><div class="we" id="we"></div><div class="wx" id="wx"></div></div>
   <div id="foot"></div>
 </div>
 
@@ -313,8 +269,7 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
   </div>
   <div class="card quiz">
     <div class="qhead">
-      <div class="qtitle" id="qtitle">Deutsch B1</div>
-      <div class="pills" id="lvlpills"></div>
+      <div class="qtitle">Deutsch B1</div>
       <div class="pills" id="pills"></div>
       <div class="score" id="score"></div>
     </div>
@@ -358,7 +313,7 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
 <section class="page planpage" id="pg-plan">
   <div class="phead">
     <div class="ptitle" id="pl-wk">Week</div><div class="prange" id="pl-range"></div>
-    <div class="pnav"><button id="pl-prev" aria-label="Previous 7 days"><i data-ic="prev"></i></button><button id="pl-today">Today</button><button id="pl-next" aria-label="Next 7 days"><i data-ic="next"></i></button></div>
+    <div class="pnav"><button id="pl-prev" aria-label="Previous week"><i data-ic="prev"></i></button><button id="pl-today">This week</button><button id="pl-next" aria-label="Next week"><i data-ic="next"></i></button></div>
     <div class="legend" id="pl-legend"></div>
   </div>
   <div class="week" id="pl-week"></div>
@@ -366,7 +321,6 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
 <section class="page quizpage" id="pg-quiz">
   <div class="card zq" id="zq">
     <div class="zhead">
-      <div class="pills" id="z-view"></div>
       <div class="pills" id="z-cat"></div>
       <div class="pills" id="z-lvl"></div>
       <div class="pills" id="z-mode"></div>
@@ -375,9 +329,8 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
       <span class="score" id="z-score"></span>
     </div>
     <div class="zbody" id="zbody"></div>
-    <div class="zbody cbody" id="cbody" hidden></div>
     <div class="zpop" id="z-pop" hidden></div>
-    <div class="zfoot" id="zfq">
+    <div class="zfoot">
       <div class="zrate">
         <button id="z-up" aria-label="Good question" aria-pressed="false"><i data-ic="up"></i></button>
         <button id="z-down" aria-label="Bad question" aria-pressed="false"><i data-ic="down"></i></button>
@@ -387,35 +340,18 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
       <button class="ghost" id="z-skip">Skip</button>
       <button class="next" id="z-next">Next</button>
     </div>
-    <div class="zfoot" id="zfc" hidden>
-      <div class="zrate">
-        <button id="c-up" aria-label="Good card" aria-pressed="false"><i data-ic="up"></i></button>
-        <button id="c-down" aria-label="Bad card" aria-pressed="false"><i data-ic="down"></i></button>
-        <button id="c-flag" aria-label="Flag a problem" aria-pressed="false"><i data-ic="flag"></i></button>
-      </div>
-      <span class="sp"></span>
-      <button class="cg miss" id="c-miss" hidden>Missed</button>
-      <button class="cg almost" id="c-almost" hidden>Almost</button>
-      <button class="cg got" id="c-got" hidden>Got it</button>
-      <button class="next show" id="c-flip">Show answer</button>
-    </div>
   </div>
-  <div class="card zc" id="zc">
-    <div class="zfig" id="z-fig"><h3 id="z-figt"></h3><svg id="z-figsvg" viewBox="0 0 400 260" preserveAspectRatio="xMidYMid meet"></svg><p id="z-figp"></p></div>
+  <div class="card zc">
     <h3 id="z-ch">Weakest concepts</h3>
     <div class="zstat" id="z-stat"></div>
     <div class="zlist" id="z-list"></div>
-    <button class="zcb" id="z-fb"><i data-ic="flag"></i>Copy feedback for Claude<i id="z-fbn" hidden></i></button>
+    <button class="zcb" id="z-fb"><i data-ic="flag"></i>Feedback<i id="z-fbn" hidden></i></button>
   </div>
-</section>
-<section class="page racepage" id="pg-race">
-  <div class="card lane" id="lane-de" style="--c:#f2b45a"><div class="lh"><span class="ln1">Deutsch</span><span class="lc" id="de-n">0</span><span class="lg" id="de-g"></span><span class="lv" id="de-lv"></span></div><div class="track"><div class="fill" id="de-fill"></div><div class="fin"></div><div class="car" id="de-car"><svg viewBox="0 0 200 90"><circle cx="45" cy="64" r="20" fill="#0c0f16" stroke="#8794ab" stroke-width="3"/><circle cx="45" cy="64" r="8" fill="#8794ab"/><circle cx="154" cy="64" r="20" fill="#0c0f16" stroke="#8794ab" stroke-width="3"/><circle cx="154" cy="64" r="8" fill="#8794ab"/><path d="M12 62 L18 44 L70 40 L92 24 L124 24 L132 38 L186 46 L190 60 L170 62 L150 52 L50 54 L30 62Z" fill="#f2b45a"/><path d="M92 24 L124 24 L132 38 L84 40Z" fill="#0c0f16" opacity=".55"/><rect x="8" y="26" width="6" height="30" rx="2" fill="#f2b45a"/><rect x="2" y="24" width="26" height="5" rx="2" fill="#f2b45a"/><rect x="176" y="52" width="20" height="5" rx="2" fill="#f2b45a"/><path d="M56 46 H110" stroke="#fff" stroke-width="3" opacity=".7"/></svg></div></div><div class="lt"><span id="de-a"></span><span id="de-b"></span></div></div>
-  <div class="card lane" id="lane-bess" style="--c:#6cb4ff"><div class="lh"><span class="ln1">BESS</span><span class="lc" id="bs-n">0</span><span class="lg" id="bs-g"></span><span class="lv" id="bs-lv"></span></div><div class="track"><div class="fill" id="bs-fill"></div><div class="fin"></div><div class="car" id="bs-car"><svg viewBox="0 0 200 90"><circle cx="45" cy="64" r="20" fill="#0c0f16" stroke="#8794ab" stroke-width="3"/><circle cx="45" cy="64" r="8" fill="#8794ab"/><circle cx="154" cy="64" r="20" fill="#0c0f16" stroke="#8794ab" stroke-width="3"/><circle cx="154" cy="64" r="8" fill="#8794ab"/><path d="M12 62 L18 44 L70 40 L92 24 L124 24 L132 38 L186 46 L190 60 L170 62 L150 52 L50 54 L30 62Z" fill="#6cb4ff"/><path d="M92 24 L124 24 L132 38 L84 40Z" fill="#0c0f16" opacity=".55"/><rect x="8" y="26" width="6" height="30" rx="2" fill="#6cb4ff"/><rect x="2" y="24" width="26" height="5" rx="2" fill="#6cb4ff"/><rect x="176" y="52" width="20" height="5" rx="2" fill="#6cb4ff"/><path d="M56 46 H110" stroke="#fff" stroke-width="3" opacity=".7"/></svg></div></div><div class="lt"><span id="bs-a"></span><span id="bs-b"></span></div></div>
 </section>
 </div>
 <div class="scrim" id="zf-scrim" hidden>
   <div class="sheet card" role="dialog" aria-modal="true">
-    <div class="stitle">Feedback for Claude<small id="zf-sub"></small></div>
+    <div class="stitle">Quiz feedback<small id="zf-sub"></small></div>
     <textarea id="zf-text" readonly></textarea>
     <div class="sfoot"><button class="danger" id="zf-reset">Reset progress</button><span class="sp"></span><button class="ghost" id="zf-close">Close</button><button class="next show" id="zf-copy">Copy</button></div>
   </div>
@@ -635,12 +571,9 @@ drawTabs(); drawTrams(); STOPS.forEach(loadStop);
 setInterval(drawTrams, 10000); setInterval(maybeRefetch, 60000);
 
 /* ---------- German quiz (exam style: one question at a time, a/b/c, specific explanation) ---------- */
-let deTotal = 0, bsTotal = 0;
-try{ if(!localStorage.getItem("dash.race.v")){ localStorage.setItem("dash.race.v", "1"); localStorage.setItem("dash.de.total", "0"); localStorage.setItem("dash.race.bess", "0"); }
-  deTotal = +localStorage.getItem("dash.de.total") || 0; bsTotal = +localStorage.getItem("dash.race.bess") || 0; }catch(e){}
-const Q = {level: "b1", words: [], verbs: [], gram: [], plur: [], nouns: [], tails: new Map(), mode: "all", asked: 0, score: 0, right: 0, cur: null, answered: false, retry: [], recent: []};
+const Q = {words: [], verbs: [], gram: [], plur: [], nouns: [], tails: new Map(), mode: "all", asked: 0, score: 0, right: 0, cur: null, answered: false, retry: [], recent: []};
 const GENDER = {der: "masculine", die: "feminine", das: "neuter"};
-const PLURAL_ONLY = new Set(["die Eltern","die Geschwister","die Ferien","die Nudeln","die Schuhe","die Verwandten","die Nachrichten","die Schulden","die Kosten","die Möbel","die Großeltern","die Unterlagen","die Überstunden","die Ausgaben","die Abfälle","die Einnahmen","die Kenntnisse","die Beweise","die Medien","die Nebenkosten"]);
+const PLURAL_ONLY = new Set(["die Eltern","die Geschwister","die Ferien","die Nudeln","die Schuhe","die Verwandten","die Nachrichten","die Schulden","die Kosten","die Möbel","die Großeltern","die Unterlagen","die Überstunden","die Ausgaben","die Einnahmen","die Kenntnisse","die Beweise","die Medien","die Nebenkosten"]);
 const NATURAL = new Set(["der Mann","die Frau","der Vater","die Mutter","der Sohn","die Tochter","der Bruder","die Schwester","der Onkel","die Tante","der Großvater","die Großmutter","der Ehemann","die Ehefrau","der Freund","die Freundin","der Kollege","die Kollegin","der Chef","die Chefin","der Arzt","die Ärztin","der Lehrer","die Lehrerin","der Student","die Studentin","der Cousin","die Cousine","der Kunde","die Kundin"]);
 const CALENDAR = new Set(["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag","Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember","Frühling","Sommer","Herbst","Winter"]);
 const RULES = [ // [suffix, article, always?, extra condition]
@@ -773,7 +706,7 @@ function renderQuestion(){
 }
 $("opts").addEventListener("click", e => {
   const b = e.target.closest(".opt"); if(!b || Q.answered || !Q.cur) return;
-  Q.answered = true; Q.asked++; deTotal++; try{ localStorage.setItem("dash.de.total", deTotal); }catch(e){}
+  Q.answered = true; Q.asked++;
   const q = Q.cur, pickI = +b.dataset.i, good = pickI === q.ans;
   if(good){ Q.right++; } else { Q.retry.push({q, due: Q.asked + 4}); }
   [...$("opts").children].forEach((x, i) => x.classList.add(i === q.ans ? "ok" : i === pickI ? "bad" : "dim"));
@@ -806,76 +739,27 @@ function drawPills(){
   });
 }
 async function getJSON(u){ const r = await fetch(u, {cache: "no-cache"}); if(!r.ok) throw new Error(u); return r.json(); }
-const DEKEY = "dash.de.lvl";
-try{ const l = localStorage.getItem(DEKEY); if(l === "b1" || l === "b2") Q.level = l; }catch(e){}
-const LVL_FILES = {b1: ["words.json", "verbs.json", "grammar.json", "plurals.json"], b2: ["words_b2.json", "verbs_b2.json", "grammar_b2.json", "plurals_b2.json"]};
-function drawLevel(){
-  $("qtitle").textContent = "Deutsch " + Q.level.toUpperCase();
-  const p = $("lvlpills"); p.innerHTML = "";
-  [["b1", "B1"], ["b2", "B2"]].forEach(([k, label]) => {
-    const b = document.createElement("button"); b.className = "pill"; b.textContent = label;
-    b.setAttribute("aria-pressed", Q.level === k ? "true" : "false");
-    b.onclick = () => { if(Q.level === k) return; Q.level = k; try{ localStorage.setItem(DEKEY, k); }catch(e){} loadLevel(); };
-    p.appendChild(b);
-  });
-}
-function loadLevel(){
-  drawLevel(); const lvl = Q.level;
-  return Promise.all(LVL_FILES[lvl].map(u => getJSON(u).catch(() => []))).then(([w, v, g, p]) => {
-    if(lvl !== Q.level) return;
-    Q.words = w.map((x, i) => Object.assign({i}, x)); Q.verbs = v; Q.gram = g; Q.plur = p;
-    Q.nouns = Q.words.map(x => { const m = /^(der|die|das) (.+)$/.exec(x.de); return m && !PLURAL_ONLY.has(x.de) ? {de: x.de, en: x.en, ex: x.ex, i: x.i, art: m[1], bare: m[2]} : null; }).filter(Boolean);
-    Q.tails = new Map(); Q.nouns.forEach(n => { const k = n.bare.toLowerCase(); if(!Q.tails.has(k)) Q.tails.set(k, n); });
-    Q.retry = []; Q.recent = []; Q.asked = 0; Q.right = 0; $("score").textContent = "";
-    drawPills(); nextQuestion();
-    window.__dbg = {Q, articleWhy, GEN};
-  });
-}
-loadLevel();
+Promise.all(["words.json", "verbs.json", "grammar.json", "plurals.json"].map(u => getJSON(u).catch(() => []))).then(([w, v, g, p]) => {
+  Q.words = w.map((x, i) => Object.assign({i}, x)); Q.verbs = v; Q.gram = g; Q.plur = p;
+  Q.nouns = Q.words.map(x => { const m = /^(der|die|das) (.+)$/.exec(x.de); return m && !PLURAL_ONLY.has(x.de) ? {de: x.de, en: x.en, ex: x.ex, i: x.i, art: m[1], bare: m[2]} : null; }).filter(Boolean);
+  Q.nouns.forEach(n => { const k = n.bare.toLowerCase(); if(!Q.tails.has(k)) Q.tails.set(k, n); });
+  drawPills(); nextQuestion();
+  window.__dbg = {Q, articleWhy, GEN};
+});
 drawPills();
 
 /* ---------- Keep the screen on ---------- */
 async function keepAwake(){ try{ if("wakeLock" in navigator) await navigator.wakeLock.request("screen"); }catch(e){} }
 keepAwake(); document.addEventListener("visibilitychange", () => { if(!document.hidden) keepAwake(); });
 
-/* ---------- Race tracker ---------- */
-const GOALS = [1000, 2500, 5000, 10000, 25000, 50000, 100000];
-function raceLevel(n){
-  let lo = 0, hi = GOALS[0], lv = 1;
-  for(let i = 0; i < GOALS.length && n >= GOALS[i]; i++){ lo = GOALS[i]; hi = GOALS[i + 1] || GOALS[i] * 2; lv = i + 2; }
-  while(n >= hi){ lo = hi; hi *= 2; lv++; }
-  return {lo, hi, lv};
-}
-const fmt = n => n.toLocaleString("en-US");
-const bessTotal = () => bsTotal;
-function raceLane(p, total, anim){
-  const L = raceLevel(total), pct = Math.min(1, (total - L.lo) / (L.hi - L.lo));
-  $(p + "-n").textContent = fmt(total); $(p + "-g").textContent = "of " + fmt(L.hi);
-  $(p + "-lv").textContent = "Level " + L.lv; $(p + "-a").textContent = fmt(L.lo); $(p + "-b").textContent = fmt(L.hi) + " 🏁";
-  const car = $(p + "-car"), fill = $(p + "-fill"), track = car.parentElement;
-  const left = pct * (track.clientWidth - car.clientWidth - track.clientWidth * 0.04);
-  if(anim){ car.style.transition = "none"; fill.style.transition = "none"; car.style.left = "0px"; fill.style.width = "0px"; void car.offsetWidth; car.style.transition = ""; fill.style.transition = ""; }
-  requestAnimationFrame(() => { car.style.left = left + "px"; fill.style.width = (left + car.clientWidth * .6) + "px"; });
-}
-function renderRace(anim){ raceLane("de", deTotal, anim); raceLane("bs", bessTotal(), anim); }
-/* ---------- Word of the day ---------- */
-fetch("wotd.json", {cache: "no-cache"}).then(r => r.json()).then(d => {
-  const w = d.words; if(!w || !w.length) return;
-  const day = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
-  const x = w[((day * 7) % w.length + w.length) % w.length];
-  $("ww").textContent = x.de; $("we").textContent = x.en; $("wx").textContent = x.ex;
-}).catch(() => { $("wotd").hidden = true; });
-
 /* ---------- Pages: swipe between dashboard and to-do ---------- */
 const pager = $("pager");
 $("dots").innerHTML = [...pager.children].map((p, i) => '<button aria-label="Page ' + (i + 1) + '"' + (i ? "" : ' aria-current="true"') + '></button>').join("");
 const dotBtns = [...$("dots").children];
-let lastPg = 0;
-function syncDots(){ const i = Math.round(pager.scrollLeft / Math.max(1, pager.clientWidth)); dotBtns.forEach((b, k) => b.setAttribute("aria-current", k === i ? "true" : "false")); if(i !== lastPg){ lastPg = i; if(pager.children[i].id === "pg-race") renderRace(true); } }
+function syncDots(){ const i = Math.round(pager.scrollLeft / Math.max(1, pager.clientWidth)); dotBtns.forEach((b, k) => b.setAttribute("aria-current", k === i ? "true" : "false")); }
 pager.addEventListener("scroll", syncDots, {passive: true});
 dotBtns.forEach((b, k) => b.addEventListener("click", () => pager.scrollTo({left: k * pager.clientWidth, behavior: "smooth"})));
-window.addEventListener("resize", () => { syncDots(); renderRace(false); });
-renderRace(false);
+window.addEventListener("resize", () => { syncDots(); });
 
 /* ---------- To-do list, reminders + notepad (saved on this iPad) ---------- */
 const TKEY = "dash.todos.v1";
@@ -965,22 +849,22 @@ const fromIso = s => { const [y, m, d] = s.split("-").map(Number); return new Da
 const mondayOf = d => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; };
 const addDays = (d, n) => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() + n); return x; };
 function isoWeek(d){ const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); const n = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - n); const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1)); return Math.ceil(((t - y0) / 86400000 + 1) / 7); }
-const DAYN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const DAYN = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 let weekOff = 0;
-const weekStart = () => addDays(new Date(), weekOff * 7);
+const weekStart = () => addDays(mondayOf(new Date()), weekOff * 7);
 $("pl-legend").innerHTML = Object.values(WHO).map(w => '<span style="--c:' + w.c + '"><i></i>' + w.n + '</span>').join("");
 function renderPlan(){
   const ws = weekStart(), we = addDays(ws, 6), today = isoD(new Date()), wrap = $("pl-week");
   const keep = [...wrap.querySelectorAll(".dlist")].map(l => l.scrollTop);
-  $("pl-wk").textContent = weekOff === 0 ? "Next 7 days" : weekOff > 0 ? "Ahead" : "Earlier";
+  $("pl-wk").textContent = "Week " + isoWeek(ws);
   const m = d => d.toLocaleDateString("en-GB", {month: "short"});
   $("pl-range").textContent = ws.getMonth() === we.getMonth() ? ws.getDate() + " – " + we.getDate() + " " + m(we) : ws.getDate() + " " + m(ws) + " – " + we.getDate() + " " + m(we);
-  $("pl-today").style.opacity = weekOff === 0 ? .45 : 1; $("pl-today").textContent = "Today";
+  $("pl-today").style.opacity = weekOff === 0 ? .45 : 1;
   wrap.innerHTML = "";
   for(let i = 0; i < 7; i++){
     const d = addDays(ws, i), key = isoD(d), col = document.createElement("div");
-    col.className = "day" + ((d.getDay() === 0 || d.getDay() === 6) ? " we" : "") + (key === today ? " today" : "") + (key < today ? " past" : "");
-    col.innerHTML = '<div class="dhead"><span class="dname">' + (key === today ? "Today" : DAYN[d.getDay()]) + '</span><span class="dnum">' + d.getDate() + '</span></div><div class="dlist"></div>';
+    col.className = "day" + (i > 4 ? " we" : "") + (key === today ? " today" : "") + (key < today ? " past" : "");
+    col.innerHTML = '<div class="dhead"><span class="dname">' + DAYN[i] + '</span><span class="dnum">' + d.getDate() + '</span></div><div class="dlist"></div>';
     const list = col.querySelector(".dlist");
     const items = plan.filter(e => e.date === key).map((e, k) => ({e, k}))
       .sort((a, b) => (a.e.time && b.e.time ? (a.e.time < b.e.time ? -1 : a.e.time > b.e.time ? 1 : 0) : a.e.time ? -1 : b.e.time ? 1 : 0) || a.k - b.k);
@@ -991,7 +875,7 @@ function renderPlan(){
       b.querySelector(".tx").textContent = e.text;
       list.appendChild(b);
     });
-    const add = document.createElement("button"); add.className = "dadd"; add.dataset.date = key; add.textContent = "+"; add.setAttribute("aria-label", "Add to " + DAYN[d.getDay()]);
+    const add = document.createElement("button"); add.className = "dadd"; add.dataset.date = key; add.textContent = "+"; add.setAttribute("aria-label", "Add to " + DAYN[i]);
     col.appendChild(add); wrap.appendChild(col);
     if(keep[i]) list.scrollTop = keep[i];
   }
@@ -1019,8 +903,8 @@ function paintSheet(){
 }
 function openSheet(it, date){
   sh.id = it ? it.id : null; sh.date = date; sh.who = it ? it.who : "general";
-  const vs = weekStart(), dd = fromIso(date), ws = (dd >= vs && dd <= addDays(vs, 6)) ? vs : dd; sh.weekStart = ws;
-  segs($("pl-day"), [0, 1, 2, 3, 4, 5, 6].map(i => { const x = addDays(ws, i); return [isoD(x), DAYN[x.getDay()] + " " + x.getDate()]; }), "date");
+  const ws = mondayOf(fromIso(date)); sh.weekStart = ws;
+  segs($("pl-day"), DAYN.map((n, i) => [isoD(addDays(ws, i)), n]), "date");
   segs($("pl-who"), Object.keys(WHO).map(k => [k, WHO[k].n, WHO[k].c]), "who");
   $("pl-text").value = it ? it.text : ""; $("pl-time").value = it ? it.time : "";
   $("pl-title").innerHTML = (it ? "Edit entry" : "New entry");
@@ -1051,7 +935,7 @@ const ZCAT = {bess: {n: "BESS and energy", c: "#f2b45a", full: "BESS, energy and
 const ZINT = [20, 50, 120, 300, 700];
 const ZREASON = [["wrong", "The marked answer is wrong"], ["multi", "More than one answer fits"], ["unclear", "Unclear wording"], ["old", "Outdated"]];
 const zEl = id => document.getElementById(id);
-let Z = {tick: 0, q: {}}, zui = {cat: "all", lvl: "all", drill: "", mode: "mixed", view: "quiz", ccat: "all", cmode: "mixed", cdrill: ""}, zbank = [], zById = {}, zcur = null, zans = false, zsess = {n: 0, c: 0}, zver = 1;
+let Z = {tick: 0, q: {}}, zui = {cat: "all", lvl: "all", drill: "", mode: "mixed"}, zbank = [], zById = {}, zcur = null, zans = false, zsess = {n: 0, c: 0}, zver = 1;
 try{ const s = JSON.parse(localStorage.getItem(ZKEY) || "null"); if(s && s.q) Z = s; }catch(e){}
 try{ Object.assign(zui, JSON.parse(localStorage.getItem(ZUI) || "{}")); }catch(e){}
 const zSave = () => { try{ localStorage.setItem(ZKEY, JSON.stringify(Z)); }catch(e){} };
@@ -1105,14 +989,7 @@ function zFit(){
 }
 window.addEventListener("resize", zFit);
 
-let ZFIG = {};
-function zFigShow(q){
-  const on = !!(q && q.fig && ZFIG[q.fig]);
-  if(on){ const f = ZFIG[q.fig]; zEl("z-figt").textContent = f.t; zEl("z-figsvg").innerHTML = f.svg; zEl("z-figp").textContent = f.s; }
-  zEl("zc").classList.toggle("showfig", on);
-}
 function zShow(q){
-  zFigShow(null);
   const body = zEl("zbody"); body.innerHTML = ""; body.style.zoom = 1;
   zPop(false);
   if(!q){
@@ -1125,7 +1002,7 @@ function zShow(q){
   q._map = q.k ? q.o.map((_, i) => i) : zShuf(q.o.map((_, i) => i));
   const cat = ZCAT[q.c] || ZCAT.ds;
   const tag = document.createElement("div"); tag.className = "ztag"; tag.style.setProperty("--c", cat.c);
-  tag.textContent = cat.full + " · " + q.s + " · " + ({senior: "Senior", dummy: "Dummy mode"}[q.l] || "Basic");
+  tag.textContent = cat.full + " · " + q.s + " · " + (q.l === "senior" ? "Senior" : "Basic");
   body.appendChild(tag);
   const pr = document.createElement("div"); pr.className = "qprompt"; pr.textContent = q.q; body.appendChild(pr);
   if(q.code){ const c = document.createElement("pre"); c.className = "zcode"; c.textContent = q.code; body.appendChild(c); }
@@ -1150,8 +1027,7 @@ function zAnswer(pos){
   const btns = [...document.querySelectorAll("#zbody .opt")];
   btns.forEach((b, i) => { if(i === right) b.classList.add("ok"); else if(i === pos) b.classList.add("bad"); else b.classList.add("dim"); });
   const r = zRec(q.id);
-  if(q.c === "bess"){ bsTotal++; try{ localStorage.setItem("dash.race.bess", bsTotal); }catch(e){} }
-  r.n++; if(ok) r.c++; else r.lw = String(q.o[q._map[pos]]).slice(0, 90);
+  r.n++; if(ok) r.c++;
   if(ok) r.box = Math.min(4, r.box + 1); else r.box = 0;
   Z.tick++; r.due = Z.tick + (ok ? ZINT[r.box] : 25); r.ts = Date.now();
   zsess.n++; if(ok) zsess.c++;
@@ -1159,7 +1035,7 @@ function zAnswer(pos){
   const res = zEl("z-res"); res.className = "res show " + (ok ? "right" : "wrong");
   res.firstChild.textContent = ok ? "Correct." : "Not quite. The answer is " + "ABCD"[right] + ") " + q.o[q.a];
   zEl("z-next").classList.add("show");
-  zScore(); zConcepts(); zFigShow(q); zFit();
+  zScore(); zConcepts(); zFit();
 }
 function zNextQ(){ zShow(zChoose()); }
 zEl("zbody").addEventListener("click", e => { const b = e.target.closest(".opt"); if(b) zAnswer(+b.dataset.pos); });
@@ -1196,52 +1072,33 @@ zEl("z-flag").addEventListener("click", () => { if(zcur) zPop(zEl("z-pop").hidde
 document.addEventListener("click", e => { const p = zEl("z-pop"); if(!p.hidden && !e.target.closest("#z-pop") && !e.target.closest("#z-flag")) p.hidden = true; });
 
 /* header: filters, score */
-const cView = () => zui.view === "cards";
-function zRefresh(){ zPills(); zConcepts(); if(cView()) cShow(cChoose()); else zShow(zChoose()); }
-function zSetView(v){
-  zui.view = v; zSaveUi(); const c = cView(); zFigShow(null);
-  zEl("zbody").hidden = c; zEl("zfq").hidden = c; zEl("cbody").hidden = !c; zEl("zfc").hidden = !c; zPop(false);
-  zEl("z-ch").textContent = c ? "Weakest card topics" : "Weakest concepts";
-  zRefresh();
-}
 function zPills(){
-  const c = cView();
-  const mk = (box, items, key, drillKey) => {
+  const mk = (box, items, key) => {
     box.innerHTML = "";
     items.forEach(([v, label]) => {
       const b = document.createElement("button"); b.className = "pill"; b.textContent = label;
-      b.dataset.v = v; b.setAttribute("aria-pressed", (drillKey ? (!zui[drillKey] && zui[key] === v) : zui[key] === v) ? "true" : "false");
-      b.addEventListener("click", () => {
-        if(key === "view") return zSetView(v);
-        zui[key] = v; if(drillKey) zui[drillKey] = ""; zSaveUi(); zRefresh();
-      });
+      b.dataset.v = v; b.setAttribute("aria-pressed", (key === "cat" ? (!zui.drill && zui.cat === v) : zui[key] === v) ? "true" : "false");
+      b.addEventListener("click", () => { zui[key] = v; if(key === "cat") zui.drill = ""; zSaveUi(); zPills(); zConcepts(); zShow(zChoose()); });
       box.appendChild(b);
     });
   };
-  mk(zEl("z-view"), [["quiz", "Quiz"], ["cards", "Cards"]], "view");
-  if(c){
-    mk(zEl("z-cat"), [["all", "All"], ["bess", "BESS"], ["ds", "Data science"], ["sw", "Software"], ["voc", "Vocabulary"]], "ccat", "cdrill");
-    mk(zEl("z-mode"), [["mixed", "Mixed"], ["new", "New"], ["missed", "Missed"], ["liked", "Liked"]], "cmode");
-  } else {
-    mk(zEl("z-cat"), [["all", "All"], ["bess", "BESS and energy"], ["ds", "Data science"], ["sw", "Software"]], "cat", "drill");
-    mk(zEl("z-mode"), [["mixed", "Mixed"], ["new", "New"], ["missed", "Missed"], ["liked", "Liked"]], "mode");
-  }
-  zEl("z-lvl").hidden = c;
-  if(!c) mk(zEl("z-lvl"), [["all", "All levels"], ["dummy", "Dummy"], ["basic", "Basic"], ["senior", "Senior"]], "lvl");
+  mk(zEl("z-cat"), [["all", "All"], ["bess", "BESS and energy"], ["ds", "Data science"], ["sw", "Software"]], "cat");
+  mk(zEl("z-lvl"), [["all", "All levels"], ["basic", "Basic"], ["senior", "Senior"]], "lvl");
+  mk(zEl("z-mode"), [["mixed", "Mixed"], ["new", "New"], ["missed", "Missed"], ["liked", "Liked"]], "mode");
   zCounts();
-  const d = zEl("z-drill"), dr = c ? zui.cdrill : zui.drill;
-  if(dr){
-    const sb = c ? cbank.find(x => x.s === dr) : zbank.find(q => q.s === dr);
-    d.style.setProperty("--c", sb ? (c ? CCAT[sb.c] : ZCAT[sb.c]).c : "#eef1f6");
-    d.innerHTML = ""; const t = document.createElement("span"); t.style.cssText = "overflow:hidden;text-overflow:ellipsis"; t.textContent = dr;
+  const d = zEl("z-drill");
+  if(zui.drill){
+    const sb = zbank.find(q => q.s === zui.drill);
+    d.style.setProperty("--c", sb ? ZCAT[sb.c].c : "#eef1f6");
+    d.innerHTML = ""; const t = document.createElement("span"); t.style.cssText = "overflow:hidden;text-overflow:ellipsis"; t.textContent = zui.drill;
     d.appendChild(t); const x = document.createElement("i"); x.innerHTML = IC("close"); d.appendChild(x); d.hidden = false;
   } else d.hidden = true;
 }
-zEl("z-drill").addEventListener("click", () => { if(cView()) zui.cdrill = ""; else zui.drill = ""; zSaveUi(); zRefresh(); });
+zEl("z-drill").addEventListener("click", () => { zui.drill = ""; zSaveUi(); zPills(); zConcepts(); zShow(zChoose()); });
 function zCounts(){
-  const c = cView(); if(!(c ? cbank : zbank).length) return;
-  const pool = c ? cPool() : zPool(), R = x => (c ? C : Z).q[x.id], seen = x => R(x) && R(x).n > 0;
-  const n = {new: pool.filter(x => !seen(x)).length, missed: pool.filter(x => seen(x) && R(x).box === 0).length, liked: pool.filter(x => R(x) && R(x).rate === 1).length};
+  if(!zbank.length) return;
+  const pool = zPool(), R = q => Z.q[q.id], seen = q => R(q) && R(q).n > 0;
+  const n = {new: pool.filter(q => !seen(q)).length, missed: pool.filter(q => seen(q) && R(q).box === 0).length, liked: pool.filter(q => R(q) && R(q).rate === 1).length};
   const lab = {new: "New", missed: "Missed", liked: "Liked"};
   document.querySelectorAll("#z-mode .pill").forEach(b => { if(lab[b.dataset.v]) b.textContent = lab[b.dataset.v] + " " + n[b.dataset.v]; });
 }
@@ -1249,7 +1106,6 @@ function zScore(){ zEl("z-score").textContent = zsess.n ? zsess.c + " / " + zses
 
 /* concepts panel */
 function zConcepts(){
-  if(cView()) return cConcepts();
   const st = zStats(), all = Object.values(st);
   let n = 0, k = 0, seen = 0, tot = zbank.length, fl = 0, bad = 0;
   zbank.forEach(q => { const r = Z.q[q.id]; if(!r) return; if(r.n){ n += r.n; k += r.c; seen++; } if(r.flags.length) fl++; if(r.rate === -1) bad++; });
@@ -1267,206 +1123,50 @@ function zConcepts(){
     box.appendChild(b);
   });
   zCounts();
-  zBadge();
+  const c = zEl("z-fbn"); c.hidden = !(fl + bad); c.textContent = fl + bad;
 }
 
-/* weak spots are found automatically */
-const zOneLine = t => String(t).replace(/\s+/g, " ").slice(0, 170);
-function zWeak(){
-  const w = [];
-  zbank.forEach(q => { const r = Z.q[q.id]; if(!r || !r.n) return;
-    const wrong = r.n - r.c;
-    if((wrong >= 2 && r.c / r.n <= .5) || (r.box === 0 && wrong >= 1 && r.n <= 2 && r.c === 0)) w.push(q); });
-  return w.sort((a, b) => (Z.q[b.id].n - Z.q[b.id].c) - (Z.q[a.id].n - Z.q[a.id].c));
-}
-function cWeak(){
-  return cbank.filter(c => { const r = C.q[c.id]; return r && ((r.m >= 2 && r.k / Math.max(1, r.n) <= .6) || (r.box === 0 && r.m >= 1 && r.n <= 2 && r.k === 0)); })
-    .sort((a, b) => C.q[b.id].m - C.q[a.id].m);
-}
-function zBadge(){
-  let n = zWeak().length + cWeak().length;
-  zbank.forEach(q => { const r = Z.q[q.id]; if(r && (r.flags.length || r.rate === -1)) n++; });
-  cbank.forEach(c => { const r = C.q[c.id]; if(r && (r.flag || r.rate === -1)) n++; });
-  const e = zEl("z-fbn"); e.hidden = !n; e.textContent = n;
-}
+/* feedback export */
 function zReport(){
-  const L = [];
+  const L = [], line = q => q.q.replace(/\s+/g, " ").slice(0, 160);
   const flagged = [], bad = [], good = [];
   zbank.forEach(q => { const r = Z.q[q.id]; if(!r) return; if(r.flags.length) flagged.push(q); if(r.rate === -1) bad.push(q); if(r.rate === 1) good.push(q); });
-  const weak = zWeak(), cw = cWeak();
-  const cflag = cbank.filter(c => C.q[c.id] && C.q[c.id].flag), cbad = cbank.filter(c => C.q[c.id] && C.q[c.id].rate === -1), cgood = cbank.filter(c => C.q[c.id] && C.q[c.id].rate === 1);
-  L.push("QUIZ AND CARDS FEEDBACK · " + new Date().toISOString().slice(0, 10) + " · questions v" + zver + " (" + zbank.length + ") · cards v" + cver + " (" + cbank.length + ")");
-  L.push("Please use this to (1) fix anything flagged, (2) write new questions and cards that approach the weak topics from different angles, (3) write more like the thumbs-up ones, and (4) avoid the style of the thumbs-down ones.", "");
-  L.push("WEAK SPOTS DETECTED AUTOMATICALLY, QUESTIONS (" + weak.length + ")");
-  weak.slice(0, 40).forEach(q => { const r = Z.q[q.id]; L.push("- " + q.id + " [" + q.s + "] right " + r.c + " of " + r.n + ". Q: " + zOneLine(q.q), "  Correct: " + q.o[q.a] + (r.lw ? " | Last wrong pick: " + r.lw : "")); });
-  L.push("", "WEAK SPOTS DETECTED AUTOMATICALLY, CARDS (" + cw.length + ")");
-  cw.slice(0, 40).forEach(c => { const r = C.q[c.id]; L.push("- " + c.id + " [" + c.s + "] missed " + r.m + " of " + r.n + ". Front: " + zOneLine(c.f) + " | Back: " + zOneLine(c.b)); });
-  L.push("", "WEAK TOPICS (accuracy, at least 3 answers)");
-  Object.values(zStats()).filter(o => o.n >= 3 && o.acc < .75).sort((a, b) => a.acc - b.acc).slice(0, 12).forEach(o => L.push("- " + o.s + ": " + Math.round(100 * o.k / o.n) + "% (" + o.k + "/" + o.n + ")"));
-  Object.values(cStats()).filter(o => o.n >= 3 && o.acc < .75).sort((a, b) => a.acc - b.acc).slice(0, 12).forEach(o => L.push("- Cards, " + o.s + ": " + Math.round(100 * o.k / o.n) + "% (" + o.k + "/" + o.n + ")"));
-  L.push("", "FLAGGED QUESTIONS (" + flagged.length + ")");
-  flagged.forEach(q => { const r = Z.q[q.id]; L.push("- " + q.id + " [" + r.flags.map(f => (ZREASON.find(x => x[0] === f) || [0, f])[1]).join("; ") + "]", "  Q: " + zOneLine(q.q), "  Options: " + q.o.join(" | "), "  Marked answer: " + q.o[q.a]); });
-  L.push("", "FLAGGED CARDS (" + cflag.length + ")"); cflag.forEach(c => L.push("- " + c.id + " Front: " + zOneLine(c.f) + " | Back: " + zOneLine(c.b)));
-  L.push("", "THUMBS-DOWN QUESTIONS (" + bad.length + ")"); bad.forEach(q => L.push("- " + q.id + ": " + zOneLine(q.q)));
-  L.push("", "THUMBS-DOWN CARDS (" + cbad.length + ")"); cbad.forEach(c => L.push("- " + c.id + ": " + zOneLine(c.f)));
-  L.push("", "THUMBS-UP QUESTIONS (" + good.length + "): " + good.map(q => q.id).join(", "));
-  L.push("THUMBS-UP CARDS (" + cgood.length + "): " + cgood.map(c => c.id).join(", "));
+  L.push("QUIZ FEEDBACK · bank v" + zver + " · " + zbank.length + " questions · " + new Date().toISOString().slice(0, 10), "");
+  L.push("FLAGGED (" + flagged.length + ")");
+  flagged.forEach(q => { const r = Z.q[q.id]; L.push("- " + q.id + " [" + r.flags.map(f => (ZREASON.find(x => x[0] === f) || [0, f])[1]).join("; ") + "]", "  Q: " + line(q), "  Options: " + q.o.join(" | "), "  Marked answer: " + q.o[q.a]); });
+  L.push("", "BAD (" + bad.length + ")"); bad.forEach(q => L.push("- " + q.id + ": " + line(q)));
+  L.push("", "GOOD (" + good.length + ")"); good.forEach(q => L.push("- " + q.id));
+  L.push("", "WEAK CONCEPTS");
+  Object.values(zStats()).filter(o => o.n >= 3).sort((a, b) => a.acc - b.acc).slice(0, 10).forEach(o => L.push("- " + o.s + ": " + Math.round(100 * o.k / o.n) + "% (" + o.k + "/" + o.n + ")"));
   return L.join("\n");
 }
-async function zCopyText(txt, ta){
-  let ok = false;
-  try{ await navigator.clipboard.writeText(txt); ok = true; }catch(e){}
-  if(!ok){ try{ ta.removeAttribute("readonly"); ta.focus(); ta.select(); ta.setSelectionRange(0, txt.length); ok = document.execCommand("copy"); ta.setAttribute("readonly", ""); ta.blur(); }catch(e){} }
-  return ok;
-}
-function zOpenFb(){
-  const ta = zEl("zf-text"); ta.value = zReport(); zEl("zf-sub").textContent = ""; zEl("zf-reset").textContent = "Reset progress"; zEl("zf-reset").dataset.armed = ""; zEl("zf-scrim").hidden = false;
-  zCopyText(ta.value, ta).then(ok => { zEl("zf-sub").textContent = ok ? "Copied. Paste it to Claude." : "Select the text and copy it"; });
-}
+function zOpenFb(){ zEl("zf-text").value = zReport(); zEl("zf-sub").textContent = ""; zEl("zf-reset").textContent = "Reset progress"; zEl("zf-reset").dataset.armed = ""; zEl("zf-scrim").hidden = false; }
 zEl("z-fb").addEventListener("click", zOpenFb);
 zEl("zf-close").addEventListener("click", () => { zEl("zf-scrim").hidden = true; });
 zEl("zf-scrim").addEventListener("click", e => { if(e.target === zEl("zf-scrim")) zEl("zf-scrim").hidden = true; });
-zEl("zf-copy").addEventListener("click", async () => { const ta = zEl("zf-text"); const ok = await zCopyText(ta.value, ta); zEl("zf-sub").textContent = ok ? "Copied. Paste it to Claude." : "Select the text and copy it"; });
+zEl("zf-copy").addEventListener("click", async () => {
+  const ta = zEl("zf-text"), txt = ta.value; let ok = false;
+  try{ await navigator.clipboard.writeText(txt); ok = true; }catch(e){}
+  if(!ok){ try{ ta.removeAttribute("readonly"); ta.focus(); ta.select(); ta.setSelectionRange(0, txt.length); ok = document.execCommand("copy"); ta.setAttribute("readonly", ""); ta.blur(); }catch(e){} }
+  zEl("zf-sub").textContent = ok ? "Copied" : "Select the text and copy it";
+});
 zEl("zf-reset").addEventListener("click", e => {
   const b = e.currentTarget;
   if(!b.dataset.armed){ b.dataset.armed = "1"; b.textContent = "Tap again to erase everything"; return; }
-  Z = {tick: 0, shown: 0, q: {}}; C = {tick: 0, shown: 0, q: {}}; zsess = {n: 0, c: 0}; zSave(); cSave(); zScore(); zRefresh(); zEl("zf-scrim").hidden = true;
+  Z = {tick: 0, shown: 0, q: {}}; zsess = {n: 0, c: 0}; zSave(); zScore(); zConcepts(); zShow(zChoose()); zEl("zf-scrim").hidden = true;
 });
-
-
-/* ---------- Flashcards: definitions and vocabulary ---------- */
-const CKEY = "dash.ec.v1", CINT = [8, 25, 70, 180, 400];
-const CCAT = {bess: {n: "BESS", c: "#f2b45a", full: "BESS, energy and engineering"}, ds: {n: "Data science", c: "#6cb4ff", full: "Data science"}, sw: {n: "Software", c: "#b79cff", full: "Software and databases"}, voc: {n: "Vocabulary", c: "#5fd6c2", full: "Vocabulary"}};
-let C = {tick: 0, shown: 0, q: {}}, cbank = [], ccur = null, cflip = false, cver = 0;
-try{ const s = JSON.parse(localStorage.getItem(CKEY) || "null"); if(s && s.q) C = s; }catch(e){}
-const cSave = () => { try{ localStorage.setItem(CKEY, JSON.stringify(C)); }catch(e){} };
-const cRec = id => C.q[id] || (C.q[id] = {n: 0, k: 0, m: 0, box: 0, due: 0, rate: 0, flag: 0});
-const cPool = () => cbank.filter(c => zui.cdrill ? c.s === zui.cdrill : (zui.ccat === "all" || c.c === zui.ccat));
-function cStats(){
-  const m = {};
-  cbank.forEach(c => {
-    const o = m[c.s] || (m[c.s] = {s: c.s, c: c.c, tot: 0, n: 0, k: 0, seen: 0}), r = C.q[c.id];
-    o.tot++; if(r && r.n){ o.n += r.n; o.k += r.k; o.seen++; }
-  });
-  Object.values(m).forEach(o => { o.acc = (o.k + 1) / (o.n + 2); });
-  return m;
-}
-function cChoose(){
-  const pool = cPool(); if(!pool.length) return null;
-  const st = cStats(), mode = zui.cmode || "mixed", R = c => C.q[c.id], seen = c => R(c) && R(c).n > 0;
-  let base = pool;
-  if(mode === "new") base = pool.filter(c => !seen(c));
-  else if(mode === "missed") base = pool.filter(c => seen(c) && R(c).box === 0);
-  else if(mode === "liked") base = pool.filter(c => R(c) && R(c).rate === 1);
-  if(!base.length) return null;
-  const age = c => (R(c) && R(c).shown != null) ? (C.shown || 0) - R(c).shown : 1e9;
-  const W = Math.min(30, Math.floor(base.length * .6));
-  let cand = base.filter(c => age(c) >= W);
-  if(!cand.length) cand = base.slice().sort((a, b) => age(b) - age(a)).slice(0, Math.max(1, Math.ceil(base.length / 2)));
-  const wk = c => 1.15 - st[c.s].acc;
-  if(mode === "mixed"){
-    const due = cand.filter(c => seen(c) && R(c).due <= C.tick), fresh = cand.filter(c => !seen(c));
-    if(due.length && (Math.random() < .3 || !fresh.length)) return zWpick(due, c => (5 - R(c).box) + wk(c) * 3);
-    if(fresh.length) return zWpick(fresh, wk);
-    return zWpick(cand, c => Math.min(age(c), 200) / 50 + wk(c));
-  }
-  return zWpick(cand, c => Math.min(age(c), 200) / 50 + .5);
-}
-function cFit(){
-  const b = zEl("cbody"); if(!b || b.hidden) return;
-  let z = 1; b.style.zoom = 1;
-  while(b.scrollHeight > b.clientHeight + 1 && z > .5){ z -= .05; b.style.zoom = z; }
-  b.style.overflowY = b.scrollHeight > b.clientHeight + 1 ? "auto" : "hidden";
-}
-window.addEventListener("resize", cFit);
-function cShow(c){
-  const body = zEl("cbody"); body.innerHTML = ""; body.style.zoom = 1; cflip = false;
-  ["c-miss", "c-almost", "c-got"].forEach(id => zEl(id).hidden = true); zEl("c-flip").hidden = false;
-  if(!c){
-    const d = document.createElement("div"); d.className = "empty";
-    const em = {new: "You have seen every card here. Switch to Mixed or Missed.", missed: "Nothing to revisit. No missed cards in this selection.", liked: "No thumbs-up cards yet."};
-    d.textContent = cbank.length ? (em[zui.cmode] || "No cards match this filter.") : "Loading cards…";
-    body.appendChild(d); ccur = null; cMark(); return;
-  }
-  ccur = c; C.shown = (C.shown || 0) + 1; cRec(c.id).shown = C.shown; cSave();
-  const cat = CCAT[c.c] || CCAT.ds;
-  const tag = document.createElement("div"); tag.className = "ztag"; tag.style.setProperty("--c", cat.c); tag.textContent = cat.full + " · " + c.s; body.appendChild(tag);
-  const f = document.createElement("div"); f.className = "cfront"; f.textContent = c.f; body.appendChild(f);
-  const back = document.createElement("div"); back.id = "c-back"; back.className = "hid";
-  const dv = document.createElement("div"); dv.className = "cdiv"; back.appendChild(dv);
-  const bk = document.createElement("div"); bk.className = "cback"; bk.textContent = c.b; back.appendChild(bk);
-  if(c.x){ const x = document.createElement("div"); x.className = "cx"; x.textContent = c.x; back.appendChild(x); }
-  body.appendChild(back);
-  cMark(); cFit();
-}
-function cReveal(){
-  if(!ccur || cflip) return; cflip = true;
-  zEl("c-back").classList.remove("hid"); zEl("c-flip").hidden = true;
-  ["c-miss", "c-almost", "c-got"].forEach(id => zEl(id).hidden = false);
-}
-function cGrade(g){
-  const c = ccur; if(!c || !cflip) return;
-  const r = cRec(c.id); r.n++; C.tick++;
-  if(g === 2){ r.k++; r.box = Math.min(4, r.box + 1); r.due = C.tick + CINT[r.box]; }
-  else if(g === 1){ r.k += .5; r.due = C.tick + Math.max(4, Math.round(CINT[r.box] / 2)); }
-  else { r.m++; r.box = 0; r.due = C.tick + CINT[0]; }
-  r.ts = Date.now(); cSave(); zsess.n++; if(g === 2) zsess.c++; zScore();
-  zConcepts(); cShow(cChoose());
-}
-function cMark(){
-  const r = ccur ? C.q[ccur.id] : null;
-  zEl("c-up").setAttribute("aria-pressed", r && r.rate === 1 ? "true" : "false");
-  zEl("c-down").setAttribute("aria-pressed", r && r.rate === -1 ? "true" : "false");
-  zEl("c-flag").setAttribute("aria-pressed", r && r.flag ? "true" : "false");
-  ["c-up", "c-down", "c-flag"].forEach(id => zEl(id).disabled = !ccur);
-}
-zEl("c-flip").addEventListener("click", cReveal);
-zEl("cbody").addEventListener("click", cReveal);
-zEl("c-miss").addEventListener("click", () => cGrade(0));
-zEl("c-almost").addEventListener("click", () => cGrade(1));
-zEl("c-got").addEventListener("click", () => cGrade(2));
-zEl("c-up").addEventListener("click", () => { if(!ccur) return; const r = cRec(ccur.id); r.rate = r.rate === 1 ? 0 : 1; cSave(); cMark(); zCounts(); zBadge(); });
-zEl("c-down").addEventListener("click", () => { if(!ccur) return; const r = cRec(ccur.id); r.rate = r.rate === -1 ? 0 : -1; cSave(); cMark(); zCounts(); zBadge(); });
-zEl("c-flag").addEventListener("click", () => { if(!ccur) return; const r = cRec(ccur.id); r.flag = r.flag ? 0 : 1; cSave(); cMark(); zBadge(); });
-function cConcepts(){
-  const st = cStats(), all = Object.values(st);
-  let n = 0, k = 0, seen = 0;
-  cbank.forEach(c => { const r = C.q[c.id]; if(r && r.n){ n += r.n; k += r.k; seen++; } });
-  zEl("z-stat").textContent = n ? "Reviewed " + n + " · Known " + Math.round(100 * k / n) + "% · Seen " + seen + " of " + cbank.length : "Seen 0 of " + cbank.length + ". Flip a few cards to find your weak spots.";
-  const rows = all.filter(o => zui.ccat === "all" || o.c === zui.ccat).sort((a, b) => (b.n > 0) - (a.n > 0) || a.acc - b.acc || a.s.localeCompare(b.s)).slice(0, 8);
-  const box = zEl("z-list"); box.innerHTML = "";
-  rows.forEach(o => {
-    const b = document.createElement("button"); b.className = "zrow"; b.style.setProperty("--c", CCAT[o.c].c);
-    b.setAttribute("aria-pressed", zui.cdrill === o.s ? "true" : "false");
-    const nm = document.createElement("span"); nm.className = "zn"; nm.textContent = o.s;
-    const v = document.createElement("span"); v.className = "zv"; v.textContent = o.n ? Math.round(100 * o.k / o.n) + "%" : "new";
-    const bar = document.createElement("i"); bar.className = "zbar"; const f = document.createElement("b"); f.style.width = (o.n ? 100 * o.k / o.n : 0) + "%"; bar.appendChild(f);
-    b.appendChild(nm); b.appendChild(v); b.appendChild(bar);
-    b.addEventListener("click", () => { zui.cdrill = zui.cdrill === o.s ? "" : o.s; zSaveUi(); zRefresh(); });
-    box.appendChild(b);
-  });
-  zCounts(); zBadge();
-}
 
 /* load the bank */
 paintIcons(zEl("pg-quiz"));
-zEl("zbody").hidden = cView(); zEl("zfq").hidden = cView(); zEl("cbody").hidden = !cView(); zEl("zfc").hidden = !cView();
-zEl("z-ch").textContent = cView() ? "Weakest card topics" : "Weakest concepts";
 zPills(); zScore();
-fetch("figs.json", {cache: "no-cache"}).then(r => r.ok ? r.json() : {}).then(d => { ZFIG = d || {}; }).catch(() => {});
 fetch("quiz.json", {cache: "no-cache"}).then(r => { if(!r.ok) throw 0; return r.json(); }).then(d => {
   zbank = (d.questions || []).filter(q => q && q.o && q.o.length >= 2 && q.a >= 0 && q.a < q.o.length); zver = d.v || 1;
   zbank.forEach(q => zById[q.id] = q);
   if(zui.drill && !zbank.some(q => q.s === zui.drill)) zui.drill = "";
-  zPills(); zConcepts(); if(!cView()) zShow(zChoose());
+  zPills(); zConcepts(); zShow(zChoose());
 }).catch(() => {
   zEl("zbody").innerHTML = '<div class="empty">Could not load quiz.json. Upload it next to index.html in the repo, then refresh.</div>';
 });
-fetch("cards.json", {cache: "no-cache"}).then(r => { if(!r.ok) throw 0; return r.json(); }).then(d => {
-  cbank = (d.cards || []).filter(c => c && c.id && c.f && c.b); cver = d.v || 1;
-  if(zui.cdrill && !cbank.some(c => c.s === zui.cdrill)) zui.cdrill = "";
-  zPills(); zConcepts(); if(cView()) cShow(cChoose());
-}).catch(() => { if(cView()) zEl("cbody").innerHTML = '<div class="empty">Could not load cards.json. Upload it next to index.html in the repo, then refresh.</div>'; });
 
 </script>
 </body>
