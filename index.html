@@ -296,7 +296,11 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
 .car svg{width:100%;height:100%;display:block}
 .lt{display:flex;justify-content:space-between;font-size:2vmin;color:var(--dim);font-variant-numeric:tabular-nums}
 /* ---- written answers graded by Gemini ---- */
-.page.writepage{grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);grid-template-rows:minmax(0,1fr)}
+.page.writepage{grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);grid-template-rows:minmax(0,1fr)}
+.page.writepage .wf{order:1}.page.writepage .wq{order:2}   /* right-handed: write on the right, read feedback on the left */
+.wbar{flex:none;display:flex;align-items:center;gap:1.2vmin;height:6.4vmin;margin-top:1.4vmin;min-width:0}
+.wbar .sp{flex:1}.wbar .ghost{height:100%;flex:none}
+body.onwrite .dots{pointer-events:none;opacity:.3}   /* no accidental page jumps from the palm */
 .wq{display:flex;flex-direction:column;min-height:0;min-width:0;padding:1.8vmin 2.4vmin 1.8vmin}
 .wq .zhead{flex-wrap:nowrap}
 .wgear{flex:none;width:5.4vmin;height:5.4vmin;border-radius:50%;border:1px solid var(--line);background:var(--card2);display:grid;place-items:center;padding:0}
@@ -309,7 +313,7 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
 .wprompt{font-size:3.3vmin;line-height:1.3;margin-top:.2vmin}
 .wsub{font-size:2.1vmin;color:var(--dim);line-height:1.4;margin-top:.8vmin}
 .wsub b{color:#cdd6e6;font-weight:500}
-.wpaper{flex:1;min-height:12vmin;display:flex;flex-direction:column;margin-top:1.6vmin;background:rgba(5,8,14,.45);border:1px solid var(--line);border-radius:2vmin;padding:1.2vmin 2vmin .8vmin}
+.wpaper{flex:1;min-height:12vmin;display:flex;flex-direction:column;margin-top:1.2vmin;background:rgba(5,8,14,.45);border:1px solid var(--line);border-radius:2vmin;padding:1.2vmin 2vmin .8vmin}
 #w-ans{flex:1;min-height:0;width:100%;resize:none;background:repeating-linear-gradient(transparent 0 5vmin,rgba(160,185,230,.14) 5vmin calc(5vmin + 1px));background-attachment:local;border:0;outline:0;color:var(--fg);font:inherit;font-size:2.8vmin;line-height:5vmin;padding:0;-webkit-user-select:text;user-select:text;caret-color:var(--warm)}
 #w-ans::placeholder{color:#66748f;font-weight:300}
 .wcount{font-size:1.8vmin;color:var(--dim);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -318,7 +322,7 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
 .wcanvas[hidden]{display:none}
 #w-canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 .wtools{position:relative;z-index:2}
-.wtools{flex:none;display:flex;align-items:center;gap:1.2vmin;min-height:5.4vmin;margin-top:.6vmin;min-width:0}
+.wtools{flex:none;display:flex;align-items:center;gap:1.2vmin;min-height:3.2vmin;margin-bottom:.6vmin;min-width:0}
 .wtools .sp{flex:1}
 .wtl{display:flex;align-items:center;gap:1vmin;min-width:0}.wtl[hidden]{display:none}
 .ghost.sm{height:4.8vmin;font-size:1.9vmin;padding:0 1.8vmin;flex:none}
@@ -377,6 +381,7 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
 @media (orientation:portrait){
   .page,.page.todopage,.page.quizpage,.page.writepage{grid-template-columns:1fr;grid-template-rows:none;overflow-y:auto;align-content:start}
   .wq{min-height:80vmin}.wf{min-height:60vmin}
+  .page.writepage .wq{order:0}.page.writepage .wf{order:1}
   .zq{min-height:90vmin}.zbody{overflow:visible;zoom:1!important}.zc{min-height:70vmin}
   .hours{flex:none}.cell{padding:2vmin .2vmin}
   .quiz{flex:none;min-height:80vmin}
@@ -521,21 +526,21 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
     <div class="ztag" id="w-tag"></div>
     <div class="wprompt" id="w-prompt">Loading questions…</div>
     <div class="wsub" id="w-sub"></div>
+    <div class="wbar">
+      <div class="seg wseg" id="w-input"></div>
+      <span class="sp"></span>
+      <button class="ghost" id="w-skip">New question</button>
+      <button class="wgo" id="w-go" disabled><span class="spin"></span><span id="w-golbl">Get feedback</span></button>
+    </div>
     <div class="wpaper">
-      <textarea id="w-ans" placeholder="Write your answer…" autocapitalize="sentences" spellcheck="false" autocorrect="off"></textarea>
-      <div class="wcanvas" id="w-cwrap" hidden><canvas id="w-canvas"></canvas></div>
       <div class="wtools">
         <div class="wtl" id="w-tpen" hidden><button class="ghost sm" id="w-undo">Undo</button><button class="ghost sm" id="w-clear">Clear</button><span class="whint" id="w-penhint">Apple Pencil only</span></div>
         <div class="wtl" id="w-tmic" hidden><button class="wmic" id="w-mic" aria-label="Start or stop speaking"><i data-ic="mic"></i></button><span class="whint" id="w-micmsg"></span></div>
         <span class="sp"></span>
         <div class="wcount" id="w-count"></div>
-        <div class="seg wseg" id="w-input"></div>
       </div>
-    </div>
-    <div class="wfoot">
-      <button class="ghost" id="w-skip">New question</button>
-      <span class="sp"></span>
-      <button class="wgo" id="w-go" disabled><span class="spin"></span><span id="w-golbl">Get feedback</span></button>
+      <textarea id="w-ans" placeholder="Write your answer…" autocapitalize="sentences" spellcheck="false" autocorrect="off"></textarea>
+      <div class="wcanvas" id="w-cwrap" hidden><canvas id="w-canvas"></canvas></div>
     </div>
   </div>
   <div class="card wf">
@@ -603,7 +608,7 @@ const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2, "0");
 const shuffle = a => { for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const pick = a => a[Math.floor(Math.random() * a.length)];
-const BUILD = "v 17 Oct 19:00";      // shown on screen so you can tell when the iPad has the latest version
+const BUILD = "v 17 Oct 19:05";      // shown on screen so you can tell when the iPad has the latest version
 const status = {};
 function setStatus(k, v){ status[k] = v; $("foot").textContent = Object.values(status).filter(Boolean).join(" · ") ; renderFoot(); }
 function renderFoot(){
@@ -1040,7 +1045,7 @@ const pager = $("pager");
 $("dots").innerHTML = [...pager.children].map((p, i) => '<button aria-label="Page ' + (i + 1) + '"' + (i ? "" : ' aria-current="true"') + '></button>').join("");
 const dotBtns = [...$("dots").children];
 let lastPg = 0;
-function syncDots(){ const i = Math.round(pager.scrollLeft / Math.max(1, pager.clientWidth)); dotBtns.forEach((b, k) => b.setAttribute("aria-current", k === i ? "true" : "false")); if(i !== lastPg){ lastPg = i; if(pager.children[i].id === "pg-race") renderRace(true); } }
+function syncDots(){ const i = Math.round(pager.scrollLeft / Math.max(1, pager.clientWidth)); document.body.classList.toggle("onwrite", pager.children[i] && pager.children[i].id === "pg-write"); dotBtns.forEach((b, k) => b.setAttribute("aria-current", k === i ? "true" : "false")); if(i !== lastPg){ lastPg = i; if(pager.children[i].id === "pg-race") renderRace(true); } }
 pager.addEventListener("scroll", syncDots, {passive: true});
 dotBtns.forEach((b, k) => b.addEventListener("click", () => pager.scrollTo({left: k * pager.clientWidth, behavior: "smooth"})));
 window.addEventListener("resize", () => { syncDots(); renderRace(false); });
@@ -1800,6 +1805,7 @@ const penEnd = e => { if(PEN.cur && e.pointerId === PEN.cur.id){ PEN.cur = null;
 cv.addEventListener("pointerup", penEnd); cv.addEventListener("pointercancel", penEnd);
 ["touchstart", "touchmove"].forEach(t => cv.addEventListener(t, e => e.preventDefault(), {passive: false}));   // stop the page swiper (and Safari gestures) stealing Pencil strokes
 document.addEventListener("selectstart", e => { if(e.target === cv) e.preventDefault(); });
+$("pg-write").querySelector(".wq").addEventListener("touchmove", e => { if(W.input === "pen" && !e.target.closest(".wf")) e.preventDefault(); }, {passive: false});   // a resting palm can't swipe to another page
 ["contextmenu", "gesturestart", "dblclick"].forEach(t => $("w-cwrap").addEventListener(t, e => e.preventDefault()));   // a long Pencil press otherwise opens Safari's menu
 $("w-undo").addEventListener("click", () => { PEN.strokes.pop(); penDraw(); wSync(); });
 $("w-clear").addEventListener("click", () => { PEN.strokes = []; penDraw(); wSync(); });
