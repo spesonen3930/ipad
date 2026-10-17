@@ -314,9 +314,10 @@ svg.ic{width:1em;height:1em;display:block;overflow:visible;fill:none;stroke-line
 #w-ans::placeholder{color:#66748f;font-weight:300}
 .wcount{font-size:1.8vmin;color:var(--dim);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 #w-ans[hidden]{display:none}
-.wcanvas{flex:1;min-height:0;position:relative;background:repeating-linear-gradient(transparent 0 5vmin,rgba(160,185,230,.14) 5vmin calc(5vmin + 1px))}
+.wcanvas{flex:1;min-height:0;position:relative;overflow:hidden;background:repeating-linear-gradient(transparent 0 5vmin,rgba(160,185,230,.14) 5vmin calc(5vmin + 1px))}
 .wcanvas[hidden]{display:none}
-#w-canvas{position:absolute;inset:0;display:block;touch-action:none;cursor:crosshair}
+#w-canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.wtools{position:relative;z-index:2}
 .wtools{flex:none;display:flex;align-items:center;gap:1.2vmin;min-height:5.4vmin;margin-top:.6vmin;min-width:0}
 .wtools .sp{flex:1}
 .wtl{display:flex;align-items:center;gap:1vmin;min-width:0}.wtl[hidden]{display:none}
@@ -1775,6 +1776,7 @@ function penDraw(){
 function penSize(){
   const r = $("w-cwrap").getBoundingClientRect(), d = devicePixelRatio || 1;
   if(!r.width || !r.height) return;
+  cv.style.width = r.width + "px"; cv.style.height = r.height + "px";      // CSS size = box size; the backing store is sharper on Retina
   cv.width = Math.round(r.width * d); cv.height = Math.round(r.height * d); penDraw();
 }
 window.addEventListener("resize", () => { if(W.input === "pen") penSize(); });
